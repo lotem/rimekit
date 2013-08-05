@@ -3,29 +3,23 @@
   <title>Rime Tools</title>
   <script src="angular.min.js"></script>
   <script src="rime-tools.js"></script>
-  <link rel="stylesheet" href="todo.css">
+  <link rel="stylesheet" href="rime-tools.css">
 </head>
 <body>
-  <h2>Hello, {{name}}</h2>
+  <h2>Spelling Algebra Debugger</h2>
   <div>
-    <label>Name:</label>
-    <input type="text" ng-model="name" placeholder="Enter your name here">
+    <label>Rime directory:</label>
+    <input type="text" ng-model="rimeDirectory" placeholder="Enter Rime directory">
+    <label>Schema:</label>
+    <input type="text" ng-model="schemaFile" placeholder="Enter schema id">
   </div>
-  <h2>Todo</h2>
-  <div ng-controller="TodoCtrl">
-    <span>{{remaining()}} of {{todos.length}} remaining</span>
-    [ <a href="" ng-click="archive()">archive</a> ]
+  <h2>Algebra</h2>
+  <div ng-controller="AlgebraCtrl">
     <ul class="unstyled">
-      <li ng-repeat="todo in todos">
-        <input type="checkbox" ng-model="todo.done">
-        <span class="done-{{todo.done}}">{{todo.text}}</span>
+      <li ng-repeat="rule in rules">
+        <span class="applied-{{rule.applied}}" ng-click="applyRules()">{{rule.formula}}</span>
       </li>
     </ul>
-    <form ng-submit="addTodo()">
-      <input type="text" ng-model="todoText"  size="30"
-             placeholder="add new todo here">
-      <input class="btn-primary" type="submit" value="add">
-    </form>
   </div>
 </body>
 </html>

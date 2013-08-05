@@ -1,27 +1,17 @@
 YAML = require('yamljs')
 
 angular.module('RimeToolsModule', []).
-  filter 'yamldoc', ->
+  filter 'toyaml', ->
     (input) ->
       YAML.stringify(input ? '')
 
-window.TodoCtrl = ($scope) ->
-  $scope.todos = [
-    {text:'learn angular', done:true}
-    {text:'build an angular app', done:false}
+window.AlgebraCtrl = ($scope) ->
+  $scope.rules = [
+    {formula: 'xlit/abc/ABC/', applied: true}
+    {formula: 'xform/abc/def/', applied: false}
   ]
-  $scope.addTodo = ->
-    $scope.todos.push {text:$scope.todoText, done:false}
-    $scope.todoText = ''
-  $scope.remaining = ->
-    count = 0
-    angular.forEach $scope.todos, (todo) ->
-      count += todo.done ? 0 : 1
-    return count
-  $scope.archive = ->
-    oldTodos = $scope.todos
-    $scope.todos = []
-    angular.forEach oldTodos, (todo) ->
-      $scope.todos.push(todo) unless todo.done
+  $scope.applyRules = ->
+    angular.forEach $scope.rules, (rule) ->
+      0
 
 # vim: set et sw=2 sts=2:
