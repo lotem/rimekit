@@ -1,0 +1,32 @@
+{
+  "name": "rime-tools-nw",
+  "description": "Rime Tools",
+  "version": "0.1.0",
+  "homepage": "https://github.com/lotem/rime-tools-nw",
+  "author": {
+    "name": "lotem",
+    "email": "chen.sst@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lotem/rime-tools-nw.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lotem/rime-tools-nw/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/lotem/rime-tools-nw/blob/master/LICENSE"
+    }
+  ],
+  "main": "index.html",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-contrib-coffee": "~0.7.0"
+  },
+  "keywords": []
+}
