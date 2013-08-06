@@ -28,7 +28,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
 
   // Default task.
-  grunt.registerTask('default', ['watch']);
+  grunt.registerTask('default', ['watch:coffee']);
 
   grunt.registerTask('run', 'Run node-webkit app', function () {
     exec('nw app.nw');
