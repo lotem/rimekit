@@ -36,7 +36,7 @@ window.AlgebraCtrl = ($scope) ->
       break unless node?
       node = node[key]
     @rules.length = 0
-    @rules.push {formula: x, applied: false} for x in node
+    @rules.push new Rule(x) for x in node
     console.debug "#{@rules.length} rules loaded."
 
   $scope.select = (index) ->

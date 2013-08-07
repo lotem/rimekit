@@ -16,6 +16,9 @@ module.exports = function (grunt) {
     },
     coffee: {
       compile: {
+        options: {
+          join: true
+        },
         files: {
           'app.nw/rime-tools.js': ['app.nw/*.coffee']
         }

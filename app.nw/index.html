@@ -22,7 +22,7 @@
     <h2>Algebra</h2>
     <ul class="unstyled">
       <li ng-repeat="rule in rules">
-        <span class="code applied-{{rule.applied}}" ng-click="select($index)">{{rule.formula}}</span>
+        <span class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</span>
       </li>
     </ul>
   </div>

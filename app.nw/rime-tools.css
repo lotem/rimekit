@@ -1,9 +1,9 @@
 .code {
   font-family: monospace;
 }
-.applied-false {
-  color: purple;
+.error-false {
+  color: blue;
 }
-.applied-true {
-  color: green;
+.error-true {
+  color: red;
 }
