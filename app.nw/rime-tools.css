@@ -1,3 +1,11 @@
+label {
+  display: inline-block;
+  width: 120px;
+  text-align: right;
+}
+.btn {
+  width: 100px;
+}
 .code {
   font-family: monospace;
 }

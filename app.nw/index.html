@@ -1,25 +1,34 @@
+<!DOCTYPE HTML>
 <html ng-app="RimeToolsModule">
 <head>
-  <title>Rime Tools</title>
+  <meta charset="utf-8">
+  <title>Rime 工具箱</title>
   <script src="angular.min.js"></script>
   <script src="rime-tools.js"></script>
   <link rel="stylesheet" href="rime-tools.css">
 </head>
 <body>
   <div ng-controller="AlgebraCtrl" ng-init="init()">
-    <h2>Spelling Algebra Debugger</h2>
+    <h2>拼寫運算調試器</h2>
     <div>
-      <label>Rime directory:</label>
-      <input type="text" ng-model="rimeDirectory" placeholder="Enter Rime directory">
-      <label>Schema:</label>
-      <input type="text" ng-model="schemaId" placeholder="Enter schema id">
-      <label>Key:</label>
-      <input type="text" ng-model="configKey" placeholder="Enter config key">
+      <label>Rime 文件夾</label>
+      <input type="text" ng-model="rimeDirectory" placeholder="Rime 用戶文件夾的路徑">
     </div>
     <div>
-      <input type="button" ng-click="reload()" value="Load">
+      <label>輸入方案</label>
+      <input type="text" ng-model="schemaId" placeholder="Rime 輸入方案標識">
     </div>
-    <h2>Algebra</h2>
+    <div>
+      <label>設定項</label>
+      <input type="text" ng-model="configKey" placeholder="以 / 分隔的鍵值">
+      <input type="button" class="btn" ng-click="loadSchema()" value="載入設定">
+    </div>
+    <div>
+      <label>詞典</label>
+      <input type="text" ng-model="dictName" placeholder="與輸入方案關聯的詞典名">
+      <input type="button" class="btn" ng-click="loadDict()" value="載入音節表">
+    </div>
+    <h3>拼寫運算規則</h3>
     <ul class="unstyled">
       <li ng-repeat="rule in rules">
         <span class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</span>

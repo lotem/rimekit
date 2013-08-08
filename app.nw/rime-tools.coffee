@@ -1,10 +1,6 @@
 fs = require('fs')
-YAML = require('yamljs')
 
 angular.module('RimeToolsModule', [])
-  .filter 'toyaml', ->
-    (input) ->
-      YAML.stringify(input ? '')
 
 window.AlgebraCtrl = ($scope) ->
   $scope.schemaId = 'luna_pinyin'
@@ -25,19 +21,26 @@ window.AlgebraCtrl = ($scope) ->
     console.log "Rime directory: #{@rimeDirectory}"
     @rimeDirectory = "/home/Rime"  # DEBUG
 
-  $scope.reload = ->
+  $scope.loadSchema = ->
     return unless @schemaId && @configKey
     filePath = "#{@rimeDirectory ? '.'}/#{@schemaId}.schema.yaml"
     unless fs.existsSync filePath
       console.warn "file does not exist: #{filePath}"
       return
-    node = YAML.load filePath
-    for key in @configKey.split '/'
-      break unless node?
-      node = node[key]
+    config = new Config
+    config.loadFile filePath
+    @dictName = config.get 'translator/dictionary' ? ''
+    ruleList = config.get @configKey
     @rules.length = 0
-    @rules.push new Rule(x) for x in node
-    console.debug "#{@rules.length} rules loaded."
+    @rules.push new Rule(x) for x in ruleList if ruleList
+    console.log "#{@rules.length} rules loaded."
+
+  $scope.loadDict = ->
+    return unless @dictName
+    filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
+    table = new Table
+    table.loadFile filePath, (syllabary) ->
+      console.debug syllabary
 
   $scope.select = (index) ->
     console.log "select: #{index}"
