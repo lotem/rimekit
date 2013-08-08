@@ -1,4 +1,4 @@
-# Rime Tools
+# Rime Kit
 
 Tools for editing and sharing Rime schemata, powered by node-webkit.
 

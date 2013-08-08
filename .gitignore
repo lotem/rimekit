@@ -1,4 +1,4 @@
 /node_modules/
 **/node_modules/
 .idea
-/app.nw/rime-tools.js
+/app.nw/rimekit.js

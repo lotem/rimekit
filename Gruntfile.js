@@ -20,7 +20,7 @@ module.exports = function (grunt) {
           join: true
         },
         files: {
-          'app.nw/rime-tools.js': ['app.nw/*.coffee']
+          'app.nw/rimekit.js': ['app.nw/*.coffee']
         }
       }
     }

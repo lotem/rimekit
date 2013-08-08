@@ -1,1 +1,1 @@
-# Rime Tools
+# Rime Kit

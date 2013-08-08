@@ -1,7 +1,5 @@
 fs = require('fs')
 
-angular.module('RimeToolsModule', [])
-
 window.AlgebraCtrl = ($scope) ->
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
