@@ -19,7 +19,6 @@ window.AlgebraCtrl = ($scope) ->
       appdata = process.env['APPDATA']
       @rimeDirectory = "#{appdata}/Rime"
     console.log "Rime directory: #{@rimeDirectory}"
-    @rimeDirectory = "/home/Rime"  # DEBUG
 
   $scope.loadSchema = ->
     return unless @schemaId && @configKey
