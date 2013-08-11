@@ -1,9 +1,10 @@
 <!DOCTYPE HTML>
-<html ng-app>
+<html ng-app="rimekit">
 <head>
   <meta charset="utf-8">
   <title>Rime 工具箱</title>
   <script src="angular.min.js"></script>
+  <script src="yaml.min.js"></script>
   <script src="rimekit.js"></script>
   <link rel="stylesheet" href="rimekit.css">
 </head>
@@ -29,9 +30,14 @@
       <input type="button" class="btn" ng-click="loadDict()" value="載入音節表">
     </div>
     <h3>拼寫運算規則</h3>
-    <ul class="unstyled">
-      <li ng-repeat="rule in rules">
-        <span class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</span>
+    <table>
+      <tr>
+        <td></td>
+        <td>{{syllabary}}</td>
+      </tr>
+      <tr ng-repeat="rule in rules">
+        <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
+        <td></td>
       </li>
     </ul>
   </div>

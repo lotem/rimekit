@@ -25,7 +25,6 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "yamljs": "~0.1.4"
   },
   "keywords": []
 }

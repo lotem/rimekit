@@ -1,9 +1,12 @@
 fs = require('fs')
 
-window.AlgebraCtrl = ($scope) ->
+app = angular.module 'rimekit', []
+
+app.controller 'AlgebraCtrl', ($scope) ->
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
   $scope.rules = []
+  $scope.syllabary = []
 
   $scope.init = ->
     console.log "platform: #{process.platform}"
@@ -25,19 +28,21 @@ window.AlgebraCtrl = ($scope) ->
       console.warn "file does not exist: #{filePath}"
       return
     config = new Config
-    config.loadFile filePath
-    @dictName = config.get 'translator/dictionary' ? ''
-    ruleList = config.get @configKey
-    @rules.length = 0
-    @rules.push new Rule(x) for x in ruleList if ruleList
-    console.log "#{@rules.length} rules loaded."
+    config.loadFile filePath, =>
+      @$apply =>
+        @dictName = config.get 'translator/dictionary' ? ''
+        rules = config.get @configKey
+        @rules = (new Rule(x) for x in rules) if rules
+        console.log "#{@rules.length} rules loaded."
 
   $scope.loadDict = ->
     return unless @dictName
     filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
     table = new Table
-    table.loadFile filePath, (syllabary) ->
-      console.debug syllabary
+    table.loadFile filePath, (syllabary) =>
+      @$apply =>
+        @syllabary = syllabary
+        console.log "#{@syllabary.length} syllables loaded."
 
   $scope.select = (index) ->
     console.log "select: #{index}"

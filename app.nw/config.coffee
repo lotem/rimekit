@@ -1,11 +1,11 @@
-YAML = require('yamljs')
-
 class Config
   constructor: (yaml) ->
     @root = if yaml then YAML.parse yaml else null
 
-  loadFile: (filePath) ->
-    @root = YAML.load filePath
+  loadFile: (filePath, callback) ->
+    YAML.load filePath, (node) =>
+      @root = node
+      callback()
 
   toString: ->
     YAML.stringify(@root)
