@@ -24,22 +24,28 @@
       <input type="text" ng-model="configKey" placeholder="以 / 分隔的鍵值">
       <input type="button" class="btn" ng-click="loadSchema()" value="載入設定">
     </div>
-    <div>
+    <div ng-show="isProjector">
       <label>詞典</label>
       <input type="text" ng-model="dictName" placeholder="與輸入方案關聯的詞典名">
       <input type="button" class="btn" ng-click="loadDict()" value="載入音節表">
     </div>
+    <div ng-show="isFormatter">
+      <label>測試文字</label>
+      <input type="text" ng-model="testString" ng-change="calculate()">
+    </div>
     <h3>拼寫運算規則</h3>
     <table>
       <tr>
-        <td></td>
-        <td>{{syllabary}}</td>
+        <td class="code">-</td>
+        <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
+        <td class="code" ng-show="isFormatter">{{testString}}</td>
       </tr>
       <tr ng-repeat="rule in rules">
         <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
-        <td></td>
-      </li>
-    </ul>
+        <td class="code" ng-show="isProjector">{{rule.resultScript.toString()}}</td>
+        <td class="code" ng-show="isFormatter">{{rule.resultSpelling.text}}</td>
+      </tr>
+    </table>
   </div>
 </body>
 </html>
