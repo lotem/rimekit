@@ -1,0 +1,52 @@
+<div ng-controller="AlgebraCtrl" ng-init="init()">
+  <form class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="rimeDirectory">Rime 文件夾</label>
+      <div class="controls">
+        <input type="text" ng-model="rimeDirectory" placeholder="Rime 用戶文件夾的路徑">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="schemaId">輸入方案</label>
+      <div class="controls">
+        <input type="text" ng-model="schemaId" placeholder="Rime 輸入方案標識">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configKey">設定項</label>
+      <div class="controls">
+        <div class="input-append">
+          <input type="text" ng-model="configKey" typeahead="key for key in configKeys | filter:$viewValue" placeholder="以 / 分隔的鍵值">
+          <button class="btn btn-primary" ng-click="loadSchema()">載入設定</button>
+        </div>
+      </div>
+    </div>
+    <div class="control-group" ng-show="isProjector">
+      <label class="control-label" for="dictName">詞典</label>
+      <div class="controls">
+        <div class="input-append">
+          <input type="text" ng-model="dictName" placeholder="與輸入方案關聯的詞典名">
+          <button class="btn" ng-click="loadDict()">載入音節表</button>
+        </div>
+      </div>
+    </div>
+    <div class="control-group" ng-show="isFormatter">
+      <label class="control-label" for="testString">測試文字</label>
+      <div class="controls">
+        <input type="text" ng-model="testString" ng-change="calculate()">
+      </div>
+    </div>
+  </form>
+  <table class="table table-bordered table-striped" ng-show="rules.length">
+    <tr>
+      <td class="code">拼寫運算前</td>
+      <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
+      <td class="code" ng-show="isFormatter">{{testString}}</td>
+    </tr>
+    <tr ng-repeat="rule in rules">
+      <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
+      <td class="code" ng-show="isProjector">{{rule.resultScript.toString()}}</td>
+      <td class="code" ng-show="isFormatter">{{rule.resultSpelling.text}}</td>
+    </tr>
+  </table>
+</div>

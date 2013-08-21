@@ -2,8 +2,18 @@ fs = require('fs')
 
 app = angular.module 'rimekit', ['ui.bootstrap']
 
+app.controller 'MainCtrl', ($scope) ->
+  $scope.tabs =
+    brise:
+      title: '東風破.net'
+      source: 'brise.html'
+      disabled: true
+    sadebugger:
+      title: '拼寫運算調試器'
+      source: 'sadebugger.html'
+
+
 app.controller 'AlgebraCtrl', ($scope) ->
-  $scope.tabs = {}
   $scope.configKeys = [
     'speller/algebra'
     'translator/preedit_format'
@@ -11,7 +21,6 @@ app.controller 'AlgebraCtrl', ($scope) ->
     'reverse_lookup/preedit_format'
     'reverse_lookup/comment_format'
   ]
-
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
   $scope.rules = []
