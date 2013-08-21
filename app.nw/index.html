@@ -51,7 +51,7 @@
             <label class="control-label" for="configKey">設定項</label>
             <div class="controls">
               <div class="input-append">
-                <input type="text" ng-model="configKey" placeholder="以 / 分隔的鍵值">
+                <input type="text" ng-model="configKey" typeahead="key for key in configKeys | filter:$viewValue" placeholder="以 / 分隔的鍵值">
                 <button class="btn btn-primary" ng-click="loadSchema()">載入設定</button>
               </div>
             </div>
@@ -72,10 +72,9 @@
             </div>
           </div>
         </form>
-        <h4>拼寫運算規則</h4>
-        <table class="table">
+        <table class="table table-bordered table-striped" ng-show="rules.length">
           <tr>
-            <td class="code">-</td>
+            <td class="code">拼寫運算前</td>
             <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
             <td class="code" ng-show="isFormatter">{{testString}}</td>
           </tr>

@@ -4,6 +4,13 @@ app = angular.module 'rimekit', ['ui.bootstrap']
 
 app.controller 'AlgebraCtrl', ($scope) ->
   $scope.tabs = {}
+  $scope.configKeys = [
+    'speller/algebra'
+    'translator/preedit_format'
+    'translator/comment_format'
+    'reverse_lookup/preedit_format'
+    'reverse_lookup/comment_format'
+  ]
 
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
@@ -25,6 +32,7 @@ app.controller 'AlgebraCtrl', ($scope) ->
 
   $scope.loadSchema = ->
     @rules = []
+    @syllabary = []
     return unless @schemaId && @configKey
     filePath = "#{@rimeDirectory ? '.'}/#{@schemaId}.schema.yaml"
     unless fs.existsSync filePath
@@ -39,9 +47,10 @@ app.controller 'AlgebraCtrl', ($scope) ->
         console.log "#{@rules.length} rules loaded."
         @isProjector = @configKey.match(/\/algebra$/) != null
         @isFormatter = @configKey.match(/format$/) != null
+        @calculate()
 
   $scope.loadDict = ->
-    $scope.syllabary = []
+    @syllabary = []
     return unless @dictName
     filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
     table = new Table
