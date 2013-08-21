@@ -4,48 +4,89 @@
   <meta charset="utf-8">
   <title>Rime 工具箱</title>
   <script src="angular.min.js"></script>
+  <script src="ui-bootstrap-tpls.min.js"></script>
   <script src="yaml.min.js"></script>
   <script src="rimekit.js"></script>
+  <link rel="stylesheet" href="bootstrap.min.css">
   <link rel="stylesheet" href="rimekit.css">
 </head>
 <body>
   <div ng-controller="AlgebraCtrl" ng-init="init()">
-    <h2>拼寫運算調試器</h2>
-    <div>
-      <label>Rime 文件夾</label>
-      <input type="text" ng-model="rimeDirectory" placeholder="Rime 用戶文件夾的路徑">
-    </div>
-    <div>
-      <label>輸入方案</label>
-      <input type="text" ng-model="schemaId" placeholder="Rime 輸入方案標識">
-    </div>
-    <div>
-      <label>設定項</label>
-      <input type="text" ng-model="configKey" placeholder="以 / 分隔的鍵值">
-      <input type="button" class="btn" ng-click="loadSchema()" value="載入設定">
-    </div>
-    <div ng-show="isProjector">
-      <label>詞典</label>
-      <input type="text" ng-model="dictName" placeholder="與輸入方案關聯的詞典名">
-      <input type="button" class="btn" ng-click="loadDict()" value="載入音節表">
-    </div>
-    <div ng-show="isFormatter">
-      <label>測試文字</label>
-      <input type="text" ng-model="testString" ng-change="calculate()">
-    </div>
-    <h3>拼寫運算規則</h3>
-    <table>
-      <tr>
-        <td class="code">-</td>
-        <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
-        <td class="code" ng-show="isFormatter">{{testString}}</td>
-      </tr>
-      <tr ng-repeat="rule in rules">
-        <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
-        <td class="code" ng-show="isProjector">{{rule.resultScript.toString()}}</td>
-        <td class="code" ng-show="isFormatter">{{rule.resultSpelling.text}}</td>
-      </tr>
-    </table>
+    <tabset>
+      <tab heading="起始頁">
+        <div class="hero-unit">
+          <h2>Rime 工具箱</h2>
+          <p>Rime 輸入法設定及輸入方案創作工具。</p>
+          <ul class="nav nav-pills nav-stacked">
+            <li class="disabled">
+              <a ng-click="tabs.brise = true">東風破.net</a>
+            </li>
+            <li>
+              <a ng-click="tabs.sad = true">拼寫運算調試器</a>
+            </li>
+          </ul>
+          <p>
+            <a class="btn btn-primary btn-large" href="http://rimeime.github.io">Rime 主頁</a>
+          </p>
+        </div>
+      </tab>
+      <tab heading="東風破.net" active="tabs.brise" disabled="true">
+        <h2>TODO</h2>
+      </tab>
+      <tab heading="拼寫運算調試器" active="tabs.sad">
+        <form class="form-horizontal">
+          <div class="control-group">
+            <label class="control-label" for="rimeDirectory">Rime 文件夾</label>
+            <div class="controls">
+              <input type="text" ng-model="rimeDirectory" placeholder="Rime 用戶文件夾的路徑">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="schemaId">輸入方案</label>
+            <div class="controls">
+              <input type="text" ng-model="schemaId" placeholder="Rime 輸入方案標識">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="configKey">設定項</label>
+            <div class="controls">
+              <div class="input-append">
+                <input type="text" ng-model="configKey" placeholder="以 / 分隔的鍵值">
+                <button class="btn btn-primary" ng-click="loadSchema()">載入設定</button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group" ng-show="isProjector">
+            <label class="control-label" for="dictName">詞典</label>
+            <div class="controls">
+              <div class="input-append">
+                <input type="text" ng-model="dictName" placeholder="與輸入方案關聯的詞典名">
+                <button class="btn" ng-click="loadDict()">載入音節表</button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group" ng-show="isFormatter">
+            <label class="control-label" for="testString">測試文字</label>
+            <div class="controls">
+              <input type="text" ng-model="testString" ng-change="calculate()">
+            </div>
+          </div>
+        </form>
+        <h4>拼寫運算規則</h4>
+        <table class="table">
+          <tr>
+            <td class="code">-</td>
+            <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
+            <td class="code" ng-show="isFormatter">{{testString}}</td>
+          </tr>
+          <tr ng-repeat="rule in rules">
+            <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
+            <td class="code" ng-show="isProjector">{{rule.resultScript.toString()}}</td>
+            <td class="code" ng-show="isFormatter">{{rule.resultSpelling.text}}</td>
+          </tr>
+        </table>
+      </tab>
+    </tabset>
   </div>
 </body>
 </html>

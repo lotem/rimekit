@@ -1,8 +1,10 @@
 fs = require('fs')
 
-app = angular.module 'rimekit', []
+app = angular.module 'rimekit', ['ui.bootstrap']
 
 app.controller 'AlgebraCtrl', ($scope) ->
+  $scope.tabs = {}
+
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
   $scope.rules = []
