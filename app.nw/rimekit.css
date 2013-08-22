@@ -7,3 +7,30 @@
 .error-true {
   color: red;
 }
+ins {
+  text-decoration: none;
+  color: darkblue;
+  background-color: #d1e4ff;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #eaeaef;
+}
+del {
+  text-decoration: line-through;
+  color: gray;
+  background-color: lightgray;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #eaeaef;
+}
+em {
+  font-style: normal;
+  color: darkgreen;
+  background-color: #d0ffd0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #eaeaef;
+}

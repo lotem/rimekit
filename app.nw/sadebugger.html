@@ -45,8 +45,8 @@
     </tr>
     <tr ng-repeat="rule in rules">
       <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
-      <td class="code" ng-show="isProjector">{{rule.resultScript.toString()}}</td>
-      <td class="code" ng-show="isFormatter">{{rule.resultSpelling.text}}</td>
+      <td class="code" ng-show="isProjector"><diff type="script" value="rule.resultScript"></diff></td>
+      <td class="code" ng-show="isFormatter"><diff value="rule.resultSpelling"></diff></td>
     </tr>
   </table>
 </div>

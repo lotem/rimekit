@@ -1,3 +1,11 @@
+class Spelling
+  constructor: (props) ->
+    @[key] = value for key, value of props
+    @text ?= ''
+    @type ?= 'normal'
+    @syllables ?= [@text]
+  toString: -> @text
+
 class Calculation
   @parse: (formula) ->
     prefix = null
@@ -33,11 +41,12 @@ class Transliteration extends Calculation
     if result == spelling.text
       [spelling]
     else [
-      text: result
-      type: spelling.type ? 'normal'
-      syllables: spelling.syllables.slice 0
-      ancestor: spelling
-      modifier: @
+      new Spelling
+        text: result
+        type: spelling.type
+        syllables: spelling.syllables.slice 0
+        ancestor: spelling
+        modifier: @
     ]
 
 class Transformation extends Calculation
@@ -56,11 +65,12 @@ class Transformation extends Calculation
     if result == spelling.text
       [spelling]
     else [
-      text: result
-      type: spelling.type ? 'normal'
-      syllables: spelling.syllables.slice 0
-      ancestor: spelling
-      modifier: @
+      new Spelling
+        text: result
+        type: spelling.type
+        syllables: spelling.syllables.slice 0
+        ancestor: spelling
+        modifier: @
     ]
 
 class Erasion extends Calculation
@@ -122,47 +132,46 @@ class Rule
   calculate: (spelling) -> @calc.calculate spelling
 
 class Script
-  constructor: (@mapping) ->
+  constructor: (@mapping = {}) ->
 
   toString: ->
     (k for k, v of @mapping).join ' '
 
   @fromSyllabary: (syllabary) ->
-      script = new Script {}
+      script = new Script
       for x in syllabary
-        script.mapping[x] =
+        script.mapping[x] = new Spelling
           text: x
-          type: 'normal'
-          syllables: [x]
       script
 
 class Algebra
   constructor: (@rules) ->
 
   formatString: (str) ->
-    spelling =
+    spelling = new Spelling
       text: str
-      type: 'normal'
-      syllables: [str]
     for r in @rules
       a = r.calculate spelling
       return '' if a.length == 0
-      spelling = r.resultSpelling = a[0]
+      next = a[0]
+      if next is spelling
+        next = new Spelling spelling  # copy
+      next.previous = spelling
+      spelling = r.resultSpelling = next
     spelling.text
 
   makeProjection: (script) ->
     for r in @rules
-      current = script.mapping
-      next = {}
-      for k, w of current
+      next = new Script {}
+      for k, w of script.mapping
         a = r.calculate w
         for x in a
-          unless x.text of next
-            next[x.text] = x
+          unless x.text of next.mapping
+            next.mapping[x.text] = x
             continue
-          y = next[x.text]
+          y = next.mapping[x.text]
           unless y.type is 'merged'
-            y = next[x.text] =
+            y = next.mapping[x.text] = new Spelling
               text: x.text
               type: 'merged'
               syllables: y.syllables.slice 0
@@ -172,6 +181,7 @@ class Algebra
             if not s in y.syllables
               y.syllables.push s
           y.threads.push x
-      script = r.resultScript = new Script next
-      console.log r.formula, script
+      next.previous = script
+      script = r.resultScript = next
+      #console.debug r.formula, script.mapping
     script
