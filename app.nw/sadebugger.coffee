@@ -64,6 +64,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
   $scope.configKey = 'speller/algebra'
   $scope.rules = []
   $scope.syllabary = []
+  $scope.alerts = []
 
   $scope.init = ->
 
@@ -101,11 +102,18 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     console.log "select: #{index}"
 
   $scope.calculate = ->
+    @alerts.length = 0
+    if @rules.length == 0
+      @alerts.push type: 'error', msg: '無有定義拼寫運算規則'
+      return
     algebra = new Algebra @rules
-    if @isProjector
+    if @isProjector and @syllabary.length
       @testScript = Script.fromSyllabary @syllabary
       console.log "calulate: #{@testScript}"
       algebra.makeProjection @testScript
-    if @isFormatter
+    if @isFormatter and @testString
       console.log "calulate: #{@testString}"
       algebra.formatString @testString ? ''
+
+  $scope.closeAlert = (index) ->
+    @alerts.splice index, 1

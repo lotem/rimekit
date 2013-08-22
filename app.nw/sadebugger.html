@@ -37,6 +37,7 @@
       </div>
     </div>
   </form>
+  <alert class="span3 offset2" ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
   <table class="table table-bordered table-striped" ng-show="rules.length">
     <tr>
       <td class="code">拼寫運算前</td>
