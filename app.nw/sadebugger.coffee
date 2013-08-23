@@ -120,7 +120,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
       console.log "calulate: #{@testScript}"
       algebra.makeProjection @testScript
     if @isFormatter and @testString
-      console.log "calulate: #{@testString}"
+      console.log "calulate: \"#{@testString}\""
       algebra.formatString @testString ? ''
 
   $scope.closeAlert = (index) ->

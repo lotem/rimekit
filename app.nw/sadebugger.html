@@ -33,7 +33,7 @@
     <div class="control-group" ng-show="isFormatter">
       <label class="control-label" for="testString">測試文字</label>
       <div class="controls">
-        <input type="text" ng-model="testString" ng-change="calculate()">
+        <input type="text" ng-model="testString" ng-trim="false" ng-change="calculate()">
       </div>
     </div>
   </form>
