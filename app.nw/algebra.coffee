@@ -146,7 +146,11 @@ class Rule
   constructor: (@formula) ->
     @calc = Calculation.parse(@formula)
     @error = !@calc
-  calculate: (spelling) -> @calc.calculate spelling
+  calculate: (spelling) ->
+    if @error
+      [spelling]
+    else
+      @calc.calculate spelling
 
 class Script
   constructor: (@mapping = {}) ->
