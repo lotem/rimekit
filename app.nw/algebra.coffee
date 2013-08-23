@@ -6,6 +6,23 @@ class Spelling
     @syllables ?= [@text]
   toString: -> @text
 
+# add support for Perl regexp \U, \L, \E
+enhancedRegexpReplace = (str, left, right) ->
+  str = str.replace left, right
+  caseChangeExpr = /\\([UL]).*?(\\E|$)/
+  if right.search(caseChangeExpr) != -1
+    while str.search(caseChangeExpr) != -1
+      str = str.replace caseChangeExpr, (text) ->
+        if text.slice(0, 2) == '\\U'
+          caseChange = String::toUpperCase
+        else if text.slice(0, 2) == '\\L'
+          caseChange = String::toLowerCase
+        else
+          return text  # what?
+        end = if text.slice(-2) == '\\E' then -2 else text.length
+        caseChange.apply text.slice 2, end
+  str
+
 class Calculation
   @parse: (formula) ->
     prefix = null
@@ -61,7 +78,7 @@ class Transformation extends Calculation
       return null
     return x
   calculate: (spelling) ->
-    result = spelling.text.replace @left, @right
+    result = enhancedRegexpReplace spelling.text, @left, @right
     if result == spelling.text
       [spelling]
     else [
