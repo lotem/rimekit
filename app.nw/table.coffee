@@ -3,9 +3,12 @@ fs = require('fs')
 class Table
   loadFile: (filePath, callback) ->
     fs.readFile filePath, (err, data) =>
-      throw err if err
-      console.log "read table #{filePath}"
-      callback(@getSyllabary data)
+      if err
+        console.error "error loading table: #{err}"
+        callback null
+      else
+        console.log "read table #{filePath}"
+        callback(@getSyllabary data)
 
   getSyllabary: (buf) ->
     result = []

@@ -5,7 +5,10 @@ class Config
   loadFile: (filePath, callback) ->
     YAML.load filePath, (node) =>
       @root = node
-      callback()
+      unless node
+        callback null
+      else
+        callback @
 
   toString: ->
     YAML.stringify(@root)

@@ -71,14 +71,19 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
   $scope.loadSchema = ->
     @rules = []
     @syllabary = []
+    @alerts.length = 0
     return unless @schemaId && @configKey
     filePath = "#{@rimeDirectory ? '.'}/#{@schemaId}.schema.yaml"
     unless fs.existsSync filePath
       console.warn "file does not exist: #{filePath}"
+      @alerts.push type: 'error', msg: '找不到輸入方案'
       return
     config = new Config
-    config.loadFile filePath, =>
+    config.loadFile filePath, (loaded) =>
       @$apply =>
+        unless loaded
+          @alerts.push type: 'error', msg: '載入輸入方案錯誤'
+          return
         @dictName = config.get 'translator/dictionary' ? ''
         rules = config.get @configKey
         @rules = (new Rule(x) for x in rules) if rules
@@ -89,11 +94,15 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
 
   $scope.loadDict = ->
     @syllabary = []
+    @alerts.length = 0
     return unless @dictName
     filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
     table = new Table
     table.loadFile filePath, (syllabary) =>
       @$apply =>
+        unless syllabary
+          @alerts.push type: 'error', msg: '載入詞典錯誤'
+          return
         @syllabary = syllabary
         console.log "#{@syllabary.length} syllables loaded."
         @calculate()
@@ -102,7 +111,6 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     console.log "select: #{index}"
 
   $scope.calculate = ->
-    @alerts.length = 0
     if @rules.length == 0
       @alerts.push type: 'error', msg: '無有定義拼寫運算規則'
       return
