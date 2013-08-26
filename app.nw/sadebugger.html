@@ -39,15 +39,17 @@
   </form>
   <alert class="span3 offset2" ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
   <table class="table table-bordered table-striped" ng-show="rules.length">
-    <tr>
-      <td class="code">拼寫運算前</td>
-      <td class="code" ng-show="isProjector">{{testScript.toString()}}</td>
-      <td class="code" ng-show="isFormatter">{{testString}}</td>
-    </tr>
     <tr ng-repeat="rule in rules">
-      <td class="code error-{{rule.error}}" ng-click="select($index)">{{rule.formula}}</td>
-      <td class="code" ng-show="isProjector"><diff type="script" value="rule.resultScript"></diff></td>
-      <td class="code" ng-show="isFormatter"><diff value="rule.resultSpelling"></diff></td>
+      <td ng-click="rules.selectedIndex = $index">
+        <div class="code error-{{rule.error}}">{{rule.formula}}</div>
+        <query update="querySpellings($index, query)" visible="{{rules.selectedIndex == $index}}"></query>
+      </td>
+      <td ng-show="isProjector">
+        <diff class="code" type="script" value="rule.resultScript"></diff>
+      </td>
+      <td ng-show="isFormatter">
+        <diff class="code" value="rule.resultSpelling"></diff>
+      </td>
     </tr>
   </table>
 </div>

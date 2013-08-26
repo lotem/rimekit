@@ -50,6 +50,20 @@ app.directive 'diff', ->
       else
         stringDiff(x)
 
+app.directive 'query', ->
+  restrict: 'E'
+  scope:
+    update: '&'
+    visible: '@'
+  template: '''<div ng-show="visible">
+    <form class="form-search" style="margin: 20px;">
+      <div class="input-append">
+        <input type="text" class="span2 search-query" ng-trim="false" ng-model="value">
+        <button type="submit" class="btn" ng-click="update({query:value})">查詢</button>
+      </div>
+    </form>
+  </div>'''
+
 app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
   $scope.configKeys = [
     'speller/algebra'
@@ -88,6 +102,8 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
         rules = config.get @configKey
         @rules = (new Rule(x) for x in rules) if rules
         console.log "#{@rules.length} rules loaded."
+        if @rules.length != 0
+          @rules.unshift new Rule  # initial state
         @isProjector = @configKey.match(/\/algebra$/) != null
         @isFormatter = @configKey.match(/format$/) != null
         @calculate()
@@ -107,21 +123,20 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
         console.log "#{@syllabary.length} syllables loaded."
         @calculate()
 
-  $scope.select = (index) ->
-    console.log "select: #{index}"
-
   $scope.calculate = ->
     if @rules.length == 0
       @alerts.push type: 'error', msg: '無有定義拼寫運算規則'
       return
     algebra = new Algebra @rules
     if @isProjector and @syllabary.length
-      @testScript = Script.fromSyllabary @syllabary
-      console.log "calulate: #{@testScript}"
-      algebra.makeProjection @testScript
+      console.log "calulate: [#{@syllabary.length} syllables]"
+      algebra.makeProjection Script.fromSyllabary @syllabary
     if @isFormatter and @testString
       console.log "calulate: \"#{@testString}\""
       algebra.formatString @testString ? ''
 
   $scope.closeAlert = (index) ->
     @alerts.splice index, 1
+
+  $scope.querySpellings = (index, pattern) ->
+    console.log index, pattern

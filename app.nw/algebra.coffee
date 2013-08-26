@@ -144,7 +144,10 @@ Calculation.factories =
 
 class Rule
   constructor: (@formula) ->
-    @calc = Calculation.parse(@formula)
+    unless @formula
+      @formula = '<無>'
+    else
+      @calc = Calculation.parse(@formula)
     @error = !@calc
   calculate: (spelling) ->
     if @error
