@@ -55,11 +55,21 @@ app.directive 'query', ->
   scope:
     update: '&'
     visible: '@'
+  controller: ($scope) ->
+    $scope.change = ->
+      console.debug 'change:', @value
+      @pattern = @error = null
+      if @value
+        try
+          @pattern = new RegExp @value
+        catch error
+          console.error "bad query: #{error}"
+          @error = error
   template: '''<div ng-show="visible">
     <form class="form-search" style="margin: 20px;">
-      <div class="input-append">
-        <input type="text" class="span2 search-query" ng-trim="false" ng-model="value">
-        <button type="submit" class="btn" ng-click="update({query:value})">查詢</button>
+      <div class="input-append control-group" ng-class="{error: error}">
+        <input type="text" class="span2 search-query" ng-trim="false" ng-model="value" ng-change="change()">
+        <button type="submit" class="btn" ng-disabled="error" ng-click="update({query:pattern})">查詢</button>
       </div>
     </form>
   </div>'''
@@ -141,23 +151,16 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     @alerts.splice index, 1
 
   $scope.querySpellings = (index, pattern) ->
-    console.log "querySpellings: #{index}, \"#{pattern}\""
+    console.log 'querySpellings:', index, pattern
     return unless @rules[index]?.script
 
-    p = null
-    if pattern
-      try
-        p = new RegExp pattern
-      catch error
-        console.error "bad query: #{error}"
-
-    unless p
+    unless pattern
       for r in @rules
         r.queryResult = r.script
       console.log 'cleared query result.'
       return
 
-    q = @rules[index].queryResult = @rules[index].script.query p
+    q = @rules[index].queryResult = @rules[index].script.query pattern
 
     r = q
     for j in [index - 1..0] by -1
