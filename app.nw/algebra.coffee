@@ -10,8 +10,8 @@ class Spelling
 enhancedRegexpReplace = (str, left, right) ->
   str = str.replace left, right
   caseChangeExpr = /\\([UL]).*?(\\E|$)/
-  if right.search(caseChangeExpr) != -1
-    while str.search(caseChangeExpr) != -1
+  if caseChangeExpr.test right
+    while caseChangeExpr.test str
       str = str.replace caseChangeExpr, (text) ->
         if text.slice(0, 2) == '\\U'
           caseChange = String::toUpperCase
@@ -101,7 +101,7 @@ class Erasion extends Calculation
       return null
     return x
   calculate: (spelling) ->
-    if spelling.text.match @pattern
+    if @pattern.test spelling.text
       []
     else
       [spelling]
@@ -174,7 +174,7 @@ class Script
   query: (pattern) ->
     s = new Script
     for k, v of @mapping
-      s.mapping[k] = v unless k.search(pattern) == -1
+      s.mapping[k] = v if pattern.test k
     s
 
   queryPrevious: (previous) ->
