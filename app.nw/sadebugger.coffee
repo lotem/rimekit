@@ -1,54 +1,54 @@
 fs = require('fs')
 
+stringDiff = (x, element, attrs) ->
+  oldValue = x?.previous?.toString() ? ''
+  newValue = x?.toString() ? ''
+  if oldValue == newValue
+    element.text newValue
+    return
+  diffMethod =
+    if attrs.unit is 'char' then JsDiff.diffChars else JsDiff.diffWords
+  changes = diffMethod(oldValue, newValue)
+  element.html JsDiff.convertChangesToXML(changes)
+
+scriptDiff = (x, element, attrs) ->
+  unless x?.previous?
+    element.text x?.toString() ? ''
+    return
+  escapeHTML = JsDiff.escapeHTML
+  compareSpellingByText = (a, b) ->
+    if a.text < b.text then -1 else if a.text > b.text then 1 else 0
+  os = x.previous.getSpellings().sort compareSpellingByText
+  ns = x.getSpellings().sort compareSpellingByText
+  changes = []
+  while os.length > 0 and ns.length > 0
+    ot = os[0].text
+    nt = ns[0].text
+    if ot < nt
+      os.shift()
+      changes.push '<del>' + escapeHTML(ot) + '</del>'
+    else if ot > nt
+      ns.shift()
+      changes.push '<ins>' + escapeHTML(nt) + '</ins>'
+    else
+      if os.shift() isnt ns.shift()
+        changes.push '<em>' + escapeHTML(nt) + '</em>'
+      else  # no change
+        changes.push escapeHTML(nt)
+  while os.length > 0
+    changes.push '<del>' + escapeHTML(os.shift().text) + '</del>'
+  while ns.length > 0
+    changes.push '<ins>' + escapeHTML(ns.shift().text) + '</ins>'
+  element.html changes.join ' '
+
 app.directive 'diff', ->
   restrict: 'E'
   link: (scope, element, attrs) ->
-    stringDiff = (x) ->
-      oldValue = x?.previous?.toString() ? ''
-      newValue = x?.toString() ? ''
-      if oldValue == newValue
-        element.text newValue
-        return
-      diffMethod =
-        if attrs.unit is 'char' then JsDiff.diffChars else JsDiff.diffWords
-      changes = diffMethod(oldValue, newValue)
-      element.html JsDiff.convertChangesToXML(changes)
-
-    scriptDiff = (x) ->
-      unless x?.previous?
-        element.text x?.toString() ? ''
-        return
-      escapeHTML = JsDiff.escapeHTML
-      compareSpellingByText = (a, b) ->
-        if a.text < b.text then -1 else if a.text > b.text then 1 else 0
-      os = (v for k, v of x.previous.mapping).sort compareSpellingByText
-      ns = (v for k, v of x.mapping).sort compareSpellingByText
-      changes = []
-      while os.length > 0 and ns.length > 0
-        ot = os[0].text
-        nt = ns[0].text
-        if ot < nt
-          os.shift()
-          changes.push '<del>' + escapeHTML(ot) + '</del>'
-        else if ot > nt
-          ns.shift()
-          changes.push '<ins>' + escapeHTML(nt) + '</ins>'
-        else
-          if os.shift() isnt ns.shift()
-            changes.push '<em>' + escapeHTML(nt) + '</em>'
-          else  # no change
-            changes.push escapeHTML(nt)
-      while os.length > 0
-        changes.push '<del>' + escapeHTML(os.shift().text) + '</del>'
-      while ns.length > 0
-        changes.push '<ins>' + escapeHTML(ns.shift().text) + '</ins>'
-      element.html changes.join ' '
-
     scope.$watch attrs.value, (x) ->
       if attrs.type is 'script'
-        scriptDiff(x)
+        scriptDiff(x, element, attrs)
       else
-        stringDiff(x)
+        stringDiff(x, element, attrs)
 
 app.directive 'query', ->
   restrict: 'E'
@@ -131,6 +131,8 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     if @isProjector and @syllabary.length
       console.log "calulate: [#{@syllabary.length} syllables]"
       algebra.makeProjection Script.fromSyllabary @syllabary
+      for r in @rules
+        r.queryResult = r.script
     if @isFormatter and @testString
       console.log "calulate: \"#{@testString}\""
       algebra.formatString @testString ? ''
@@ -139,4 +141,28 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     @alerts.splice index, 1
 
   $scope.querySpellings = (index, pattern) ->
-    console.log index, pattern
+    console.log "querySpellings: #{index}, \"#{pattern}\""
+    return unless @rules[index]?.script
+
+    p = null
+    if pattern
+      try
+        p = new RegExp pattern
+      catch error
+        console.error "bad query: #{error}"
+
+    unless p
+      for r in @rules
+        r.queryResult = r.script
+      console.log 'cleared query result.'
+      return
+
+    q = @rules[index].queryResult = @rules[index].script.query p
+
+    r = q
+    for j in [index - 1..0] by -1
+      r = @rules[j].queryResult = r.queryPrevious @rules[j].script
+
+    r = q
+    for j in [index + 1...@rules.length]
+      r = @rules[j].queryResult = r.queryNext @rules[j].script

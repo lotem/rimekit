@@ -156,17 +156,59 @@ class Rule
       @calc.calculate spelling
 
 class Script
-  constructor: (@mapping = {}) ->
-
-  toString: ->
-    (k for k, v of @mapping).join ' '
-
   @fromSyllabary: (syllabary) ->
       script = new Script
       for x in syllabary
         script.mapping[x] = new Spelling
           text: x
       script
+
+  constructor: (@mapping = {}) ->
+
+  toString: ->
+    (k for k, v of @mapping).join ' '
+
+  getSpellings: ->
+    (v for k, v of @mapping)
+
+  query: (pattern) ->
+    s = new Script
+    for k, v of @mapping
+      s.mapping[k] = v unless k.search(pattern) == -1
+    s
+
+  queryPrevious: (previous) ->
+    s = new Script
+    nodes = previous.getSpellings()
+    return s if nodes.length == 0
+    for k, v of @mapping
+      if v in nodes
+        s.mapping[k] = v
+      else if v.ancestor? and v.ancestor in nodes
+        s.mapping[v.ancestor.text] = v.ancestor
+      else if v.threads?
+        for w in v.threads
+          if w in nodes
+            s.mapping[w.text] = w
+          else if w.ancestor? and w.ancestor in nodes
+            s.mapping[w.ancestor.text] = w.ancestor
+    @previous = s
+    s
+
+  queryNext: (next) ->
+    s = new Script
+    nodes = @getSpellings()
+    return s if nodes.length == 0
+    for k, v of next.mapping
+      if v in nodes or v.ancestor? and v.ancestor in nodes
+        s.mapping[k] = v
+      else if v.threads?
+        for w in v.threads
+          if w in nodes or w.ancestor? and w.ancestor in nodes
+            s.mapping[k] = v
+            break
+    s.previous = @
+    s
 
 class Algebra
   constructor: (@rules) ->
@@ -181,7 +223,7 @@ class Algebra
       if next is spelling
         next = new Spelling spelling  # copy
       next.previous = spelling
-      spelling = r.resultSpelling = next
+      spelling = r.spelling = next
     spelling.text
 
   makeProjection: (script) ->
@@ -206,6 +248,6 @@ class Algebra
               y.syllables.push s
           y.threads.push x
       next.previous = script
-      script = r.resultScript = next
+      script = r.script = next
       #console.debug r.formula, script.mapping
     script

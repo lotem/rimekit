@@ -16,7 +16,9 @@
       <label class="control-label" for="configKey">設定項</label>
       <div class="controls">
         <div class="input-append">
-          <input type="text" ng-model="configKey" typeahead="key for key in configKeys | filter:$viewValue" placeholder="以 / 分隔的鍵值">
+          <input type="text" ng-model="configKey"
+                 typeahead="key for key in configKeys | filter:$viewValue"
+                 placeholder="以 / 分隔的鍵值">
           <button class="btn btn-primary" ng-click="loadSchema()">載入設定</button>
         </div>
       </div>
@@ -45,10 +47,10 @@
         <query update="querySpellings($index, query)" visible="{{rules.selectedIndex == $index}}"></query>
       </td>
       <td ng-show="isProjector">
-        <diff class="code" type="script" value="rule.resultScript"></diff>
+        <diff class="code" type="script" value="rule.queryResult"></diff>
       </td>
       <td ng-show="isFormatter">
-        <diff class="code" value="rule.resultSpelling"></diff>
+        <diff class="code" value="rule.spelling"></diff>
       </td>
     </tr>
   </table>
