@@ -44,7 +44,7 @@
     <tr ng-repeat="rule in rules">
       <td ng-click="rules.selectedIndex = $index">
         <div class="code error-{{rule.error}}">{{rule.formula}}</div>
-        <query update="querySpellings($index, query)" visible="{{rules.selectedIndex == $index}}"></query>
+        <query update="querySpellings($index, query)" visible="{{isProjector && rules.selectedIndex == $index}}"></query>
       </td>
       <td ng-show="isProjector">
         <diff class="code" type="script" value="rule.queryResult"></diff>
