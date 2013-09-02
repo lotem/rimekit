@@ -1,17 +1,23 @@
 class Config
   constructor: (yaml) ->
-    @root = if yaml then YAML.parse yaml else null
+    @root = if yaml then jsyaml.safeLoad yaml else null
 
   loadFile: (filePath, callback) ->
-    YAML.load filePath, (node) =>
-      @root = node
-      unless node
+    fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
+      if err
+        console.error "error loading config: #{err}"
         callback null
       else
+        try
+          @root = jsyaml.safeLoad data, filename: filePath
+        catch err
+          console.error "error loading config: #{err}"
+          callback null
+          return
         callback @
 
   toString: ->
-    YAML.stringify(@root)
+    jsyaml.safeDump @root, flowLevel: 3
 
   get: (key) ->
     ks = (x for x in key.split '/' when x)
