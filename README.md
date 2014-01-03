@@ -6,15 +6,14 @@ Tools for editing and sharing Rime schemata, powered by node-webkit.
 
 
 ```
-node install -g grunt-cli
+npm install -g grunt-cli
 
 cd rimekit
-node install
+npm install
 
 grunt coffee run
 ```
 
 ## Todos
 
-- Spelling Algebra Debugger
 - LaBrise.net
