@@ -26,5 +26,8 @@
   },
   "dependencies": {
   },
+  "optionalDependencies": {
+    "windows": "*"
+  },
   "keywords": []
 }

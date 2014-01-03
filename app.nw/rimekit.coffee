@@ -1,5 +1,12 @@
 app = angular.module 'rimekit', ['ui.bootstrap']
 
+customRimeUserDir = ->
+  try
+    key = require('windows')?.registry('HKCU/Software/Rime/Weasel')
+  catch
+    console.warn 'could not access Windows registry.'
+  key?.RimeUserDir?.value
+
 app.factory 'rimekitService', ->
   console.log "version: #{process.version}"
   console.log "platform: #{process.platform}"
@@ -11,7 +18,7 @@ app.factory 'rimekitService', ->
     rimeDirectory = "#{home}/.config/ibus/rime"
   else if process.platform == 'win32'
     appdata = process.env['APPDATA']
-    rimeDirectory = "#{appdata}/Rime"
+    rimeDirectory = customRimeUserDir() or "#{appdata}\\Rime"
   console.log "Rime directory: #{rimeDirectory}"
   nodeVersion: process.version
   platform: process.platform
