@@ -1,4 +1,5 @@
 fs = require('fs')
+JsDiff = require('diff')
 
 stringDiff = (x, element, attrs) ->
   oldValue = x?.previous?.toString() ? ''
