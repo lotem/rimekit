@@ -25,7 +25,8 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "firebase": "*"
+    "firebase": "*",
+    "js-yaml": "*"
   },
   "optionalDependencies": {
     "windows": "*"

@@ -1,3 +1,5 @@
+jsyaml = require 'js-yaml'
+
 class Config
   constructor: (yaml) ->
     @root = if yaml then jsyaml.safeLoad yaml else null
