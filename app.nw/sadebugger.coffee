@@ -1,5 +1,6 @@
 fs = require('fs')
-JsDiff = require('diff')
+diff = require('diff')
+escape = require('escape-html')
 
 stringDiff = (x, element, attrs) ->
   oldValue = x?.previous?.toString() ? ''
@@ -8,15 +9,14 @@ stringDiff = (x, element, attrs) ->
     element.text newValue
     return
   diffMethod =
-    if attrs.unit is 'char' then JsDiff.diffChars else JsDiff.diffWords
+    if attrs.unit is 'char' then diff.diffChars else diff.diffWords
   changes = diffMethod(oldValue, newValue)
-  element.html JsDiff.convertChangesToXML(changes)
+  element.html diff.convertChangesToXML(changes)
 
 scriptDiff = (x, element, attrs) ->
   unless x?.previous?
     element.text x?.toString() ? ''
     return
-  escapeHTML = JsDiff.escapeHTML
   compareSpellingByText = (a, b) ->
     if a.text < b.text then -1 else if a.text > b.text then 1 else 0
   os = x.previous.getSpellings().sort compareSpellingByText
@@ -27,19 +27,19 @@ scriptDiff = (x, element, attrs) ->
     nt = ns[0].text
     if ot < nt
       os.shift()
-      changes.push '<del>' + escapeHTML(ot) + '</del>'
+      changes.push '<del>' + escape(ot) + '</del>'
     else if ot > nt
       ns.shift()
-      changes.push '<ins>' + escapeHTML(nt) + '</ins>'
+      changes.push '<ins>' + escape(nt) + '</ins>'
     else
       if os.shift() isnt ns.shift()
-        changes.push '<em>' + escapeHTML(nt) + '</em>'
+        changes.push '<em>' + escape(nt) + '</em>'
       else  # no change
-        changes.push escapeHTML(nt)
+        changes.push escape(nt)
   while os.length > 0
-    changes.push '<del>' + escapeHTML(os.shift().text) + '</del>'
+    changes.push '<del>' + escape(os.shift().text) + '</del>'
   while ns.length > 0
-    changes.push '<ins>' + escapeHTML(ns.shift().text) + '</ins>'
+    changes.push '<ins>' + escape(ns.shift().text) + '</ins>'
   element.html changes.join ' '
 
 app.directive 'diff', ->
