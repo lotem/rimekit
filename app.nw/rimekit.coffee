@@ -29,7 +29,6 @@ app.controller 'MainCtrl', ($scope) ->
     brise:
       title: '東風破.net'
       source: 'brise.html'
-      disabled: true
     sadebugger:
       title: '拼寫運算調試器'
       source: 'sadebugger.html'
