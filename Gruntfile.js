@@ -33,6 +33,8 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['watch']);
 
+  grunt.registerTask('build', ['coffee']);
+
   grunt.registerTask('run', 'Run node-webkit app', function () {
     exec('nw app.nw');
   });

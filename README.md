@@ -4,14 +4,17 @@ Tools for editing and sharing Rime schemata, powered by node-webkit.
 
 # Setup
 
-
 ```
 npm install -g grunt-cli
 
+# install build dependencies
 cd rimekit
 npm install
 
-grunt coffee run
+# install runtime dependencies
+(cd app.nw; npm install)
+
+grunt build run
 ```
 
 ## Todos
