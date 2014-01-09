@@ -18,6 +18,9 @@ class Config
           return
         callback @
 
+  saveFile: (filePath, callback) ->
+    fs.writeFile filePath, @toString(), callback
+
   toString: ->
     jsyaml.safeDump @root, flowLevel: 3
 
