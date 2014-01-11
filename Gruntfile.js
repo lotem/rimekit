@@ -11,7 +11,7 @@ module.exports = function (grunt) {
       },
       coffee: {
         files: ['rime/*.coffee', 'app.nw/*.coffee'],
-        tasks: ['coffee:compile']
+        tasks: ['coffee']
       }
     },
     coffee: {
@@ -23,17 +23,10 @@ module.exports = function (grunt) {
           'app.nw/rime.js': ['rime/*.coffee'],
           'app.nw/rimekit.js': ['app.nw/*.coffee']
         }
-      },
-      test: {
-        expand: true,
-        cwd: 'test',
-        src: ['*.coffee'],
-        dest: 'test',
-        ext: '.js'
       }
     },
     nodeunit: {
-      all: ['test/test-*.js']
+      all: ['test/test-*.coffee']
     }
   });
 
@@ -47,11 +40,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', ['coffee']);
 
+  grunt.registerTask('test', ['nodeunit']);
+
   grunt.registerTask('run', 'Run node-webkit app', function () {
     exec('nw app.nw');
   });
-
-  grunt.registerTask('test', ['coffee:test', 'nodeunit']);
 };
 
 // vim: set et sw=2 sts=2:
