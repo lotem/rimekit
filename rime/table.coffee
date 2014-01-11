@@ -1,6 +1,6 @@
 fs = require('fs')
 
-class Table
+exports.Table = class Table
   loadFile: (filePath, callback) ->
     fs.readFile filePath, (err, data) =>
       if err

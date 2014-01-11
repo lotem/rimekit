@@ -1,6 +1,6 @@
 jsyaml = require 'js-yaml'
 
-class Config
+exports.Config = class Config
   constructor: (yaml) ->
     @root = if yaml then jsyaml.safeLoad yaml else null
 

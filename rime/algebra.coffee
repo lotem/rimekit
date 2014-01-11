@@ -1,4 +1,4 @@
-class Spelling
+exports.Spelling = class Spelling
   constructor: (props) ->
     @[key] = value for key, value of props
     @text ?= ''
@@ -23,7 +23,7 @@ enhancedRegexpReplace = (str, left, right) ->
         caseChange.apply text.slice 2, end
   str
 
-class Calculation
+exports.Calculation = class Calculation
   @parse: (formula) ->
     prefix = null
     a = formula.split ''
@@ -142,7 +142,7 @@ Calculation.factories =
   fuzz: Fuzzing
   abbrev: Abbreviation
 
-class Rule
+exports.Rule = class Rule
   constructor: (@formula) ->
     unless @formula
       @formula = '<無>'
@@ -155,7 +155,7 @@ class Rule
     else
       @calc.calculate spelling
 
-class Script
+exports.Script = class Script
   @fromSyllabary: (syllabary) ->
       script = new Script
       for x in syllabary
@@ -210,7 +210,7 @@ class Script
     s.previous = @
     s
 
-class Algebra
+exports.Algebra = class Algebra
   constructor: (@rules) ->
 
   formatString: (str) ->

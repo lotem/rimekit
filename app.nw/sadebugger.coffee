@@ -1,6 +1,7 @@
 fs = require('fs')
 diff = require('diff')
 escape = require('escape-html')
+rime = require('./rime')
 
 stringDiff = (x, element, attrs) ->
   oldValue = x?.previous?.toString() ? ''
@@ -103,7 +104,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
       console.warn "file does not exist: #{filePath}"
       @alerts.push type: 'error', msg: '找不到輸入方案'
       return
-    config = new Config
+    config = new rime.Config
     config.loadFile filePath, (loaded) =>
       @$apply =>
         unless loaded
@@ -111,10 +112,10 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
           return
         @dictName = config.get 'translator/dictionary' ? ''
         rules = config.get @configKey
-        @rules = (new Rule(x) for x in rules) if rules
+        @rules = (new rime.Rule(x) for x in rules) if rules
         console.log "#{@rules.length} rules loaded."
         if @rules.length != 0
-          @rules.unshift new Rule  # initial state
+          @rules.unshift new rime.Rule  # initial state
         @isProjector = @configKey.match(/\/algebra$/) != null
         @isFormatter = @configKey.match(/format$/) != null
         @calculate()
@@ -124,7 +125,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     @alerts.length = 0
     return unless @dictName
     filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
-    table = new Table
+    table = new rime.Table
     table.loadFile filePath, (syllabary) =>
       @$apply =>
         unless syllabary
@@ -138,10 +139,10 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     if @rules.length == 0
       @alerts.push type: 'error', msg: '無有定義拼寫運算規則'
       return
-    algebra = new Algebra @rules
+    algebra = new rime.Algebra @rules
     if @isProjector and @syllabary.length
       console.log "calulate: [#{@syllabary.length} syllables]"
-      algebra.makeProjection Script.fromSyllabary @syllabary
+      algebra.makeProjection rime.Script.fromSyllabary @syllabary
       for r in @rules
         r.queryResult = r.script
     if @isFormatter and @testString

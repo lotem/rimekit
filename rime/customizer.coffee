@@ -1,4 +1,4 @@
-class Customizer extends Config
+exports.Customizer = class Customizer extends Config
 
   constructor: (yaml) ->
     super(yaml)
