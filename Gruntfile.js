@@ -10,7 +10,7 @@ module.exports = function (grunt) {
         tasks: ['run']
       },
       coffee: {
-        files: 'app.nw/*.coffee',
+        files: ['rime/*.coffee', 'app.nw/*.coffee'],
         tasks: ['coffee']
       }
     },
@@ -20,6 +20,7 @@ module.exports = function (grunt) {
           join: true
         },
         files: {
+          'app.nw/rime.js': ['rime/*.coffee'],
           'app.nw/rimekit.js': ['app.nw/*.coffee']
         }
       }
