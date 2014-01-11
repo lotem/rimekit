@@ -14,7 +14,9 @@ npm install
 # install runtime dependencies
 (cd app.nw; npm install)
 
-grunt build run
+grunt build
+grunt test
+grunt run
 ```
 
 ## Todos
