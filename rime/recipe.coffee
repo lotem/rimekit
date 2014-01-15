@@ -9,6 +9,8 @@ exports.cook = cook = (recipe) ->
     recipe.props.setup.call recipe
   catch e
     console.error 'error cooking recipe: ' + e
+    return false
+  return true
 
 exports.Recipe = class Recipe
 
