@@ -20,6 +20,8 @@ exports.Recipe = class Recipe
   validate: ->
     throw Error('missing recipe name.') unless @props.name
     throw Error('missing recipe version.') unless @props.version
+    unless /^[_0-9A-Za-z]+$/.test @props.name
+      throw Error('recipe name should be alpha_numeric.')
     unless typeof @props.version is 'string'
       throw Error('recipe version should be string type.')
     # TODO
