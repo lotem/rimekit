@@ -16,6 +16,10 @@ exports.Recipe = class Recipe
     @validate()
 
   validate: ->
+    throw Error('missing recipe name.') unless @props.name
+    throw Error('missing recipe version.') unless @props.version
+    unless typeof @props.version is 'string'
+      throw Error('recipe version should be string type.')
     # TODO
 
   installSchema: (schemaId, options) ->
