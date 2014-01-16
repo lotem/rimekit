@@ -1,7 +1,10 @@
-exports.cook = cook = (recipe, ingredients) ->
-  unless recipe instanceof Recipe
-    recipe = new Recipe recipe
+exports.cook = cook = (recipe, ingredients, callback) ->
+  if not callback? and typeof ingredients is 'function'  # (recipe, callback)
+    [ingredients, callback] = [null, ingredients]
+  callback ?= (err) -> throw err if err
   try
+    unless recipe instanceof Recipe
+      recipe = new Recipe recipe
     if recipe.props.files
       recipe.downloadFiles()
     if recipe.props.params
@@ -9,9 +12,10 @@ exports.cook = cook = (recipe, ingredients) ->
     if recipe.props.setup
       recipe.props.setup.call recipe
   catch e
-    console.error 'error cooking recipe: ' + e
-    return false
-  return true
+    console.error "error cooking recipe: #{e}"
+    callback(e)
+    return
+  callback()
 
 exports.Recipe = class Recipe
 
@@ -31,7 +35,7 @@ exports.Recipe = class Recipe
     for param in @props.params
       unless param and typeof param is 'object'
         throw Error('invalid parameter definition.')
-      if param.required and typeof ingredients[param.name] is 'undefined'
+      if param.required and not ingredients?[param.name]?
         throw Error("missing ingredient: #{param.name}")
     # TODO
 

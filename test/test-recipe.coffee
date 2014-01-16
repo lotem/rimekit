@@ -17,20 +17,18 @@ exports.testRecipeValidation = (test) ->
   test.done()
 
 exports.testParametrizedRecipe = (test) ->
-  test.ok !rime.cook new rime.Recipe(
+  recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'
     params: [
-      {name: 'a_param', required: true}
+      {name: 'required_param', required: true}
     ]
-  ), {}
-  test.ok rime.cook new rime.Recipe(
+  test.throws -> rime.cook recipe
+  recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'
     params: [
-      {name: 'a_param', required: true}
+      {name: 'required_param', required: true}
     ]
-  ), {
-    a_param: 'ingredient'
-  }
+  test.doesNotThrow -> rime.cook recipe, {required_param: 'value'}
   test.done()
