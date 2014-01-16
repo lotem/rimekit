@@ -10,8 +10,27 @@ exports.testRecipeValidation = (test) ->
     name: 'a_name'
     version: 1.0
   ), Error, 'Should fail for recipe version.'
-  test.doesNotThrow -> new rime.Recipe
+  test.doesNotThrow (-> new rime.Recipe
     name: 'a_name'
     version: '1.0'
+  ), Error, 'Should pass recipe validation.'
   test.done()
 
+exports.testParametrizedRecipe = (test) ->
+  test.ok !rime.cook new rime.Recipe(
+    name: 'a_name'
+    version: '1.0'
+    params: [
+      {name: 'a_param', required: true}
+    ]
+  ), {}
+  test.ok rime.cook new rime.Recipe(
+    name: 'a_name'
+    version: '1.0'
+    params: [
+      {name: 'a_param', required: true}
+    ]
+  ), {
+    a_param: 'ingredient'
+  }
+  test.done()
