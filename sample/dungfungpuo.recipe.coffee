@@ -10,5 +10,5 @@ cook new Recipe
     'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.dict.yaml'
   ]
   setup: ->
-    @installSchema 'dungfungpuo'
+    @installSchema 'dungfungpuo',
       enable: true
