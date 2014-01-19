@@ -19,6 +19,16 @@ grunt test
 grunt run
 ```
 
-## Todos
+# Tools
 
-- LaBrise.net
+## La brise
+
+The collabrative Rime schema repository.
+
+Input schemata and configuration scripts are available as recipes.
+
+Browse, find the recipes you need, and cook Rime to perfection.
+
+## Spelling Algebra Debugger
+
+## Color Scheme Editor
