@@ -1,13 +1,16 @@
+fs = require 'fs'
+
+# recipe: Recipe or {...}
+# ingredients: {...}
+# callback: (err) ->
 exports.cook = cook = (recipe, ingredients, callback) ->
-  if not callback? and typeof ingredients is 'function'  # (recipe, callback)
-    [ingredients, callback] = [null, ingredients]
   # if no callback is given, throw errors
   callback ?= (err) -> throw err if err
   try
     unless recipe instanceof Recipe  # cook {...}, ...
       recipe = new Recipe recipe
     if recipe.props.params
-      recipe.collectParams(ingredients)
+      recipe.collectParams(ingredients ? {})
   catch e
     console.error "error cooking recipe: #{e}"
     callback e
@@ -18,17 +21,15 @@ exports.cook = cook = (recipe, ingredients, callback) ->
       return
     if recipe.props.setup
       try
-        recipe.props.setup.call recipe
+        recipe.props.setup.call recipe, callback
       catch e
         console.error "error cooking recipe: #{e}"
         callback e
         return
-    callback()
   if recipe.props.files
     recipe.downloadFiles finish
   else  # no files needed to download
     finish()
-
 
 exports.Recipe = class Recipe
 
@@ -36,31 +37,52 @@ exports.Recipe = class Recipe
     @validate()
 
   validate: ->
+    # name and version are required
     throw Error('missing recipe name.') unless @props.name
     throw Error('missing recipe version.') unless @props.version
     unless /^[_0-9A-Za-z]+$/.test @props.name
       throw Error('recipe name should be alpha_numeric.')
     unless typeof @props.version is 'string'
       throw Error('recipe version should be string type.')
-    # TODO
+    # rime directory
+    unless @props.rimeDirectory and fs.existsSync @props.rimeDirectory
+      throw Error('Rime directory not accessible.')
 
   collectParams: (ingredients) ->
     for param in @props.params
       unless param and typeof param is 'object'
         throw Error('invalid parameter definition.')
-      if param.required and not ingredients?[param.name]?
+      if param.required and not ingredients[param.name]?
         throw Error("missing ingredient: #{param.name}")
     # TODO
 
+  # callback: (err) ->
   downloadFiles: (callback) ->
     # TODO
     callback()
 
-  installSchema: (schemaId, options) ->
+  # callback: (err) ->
+  installSchema: (schemaId, callback) ->
     # TODO
 
-  enableSchema: (schemaId, enabled = true) ->
+  # callback: (err) ->
+  enableSchema: (schemaId, callback) ->
     # TODO
 
-  customize: (configId, proc) ->
+  # callback: (err) ->
+  disableSchema: (schemaId, callback) ->
     # TODO
+
+  # callback: (err) ->
+  # proc: (customizer) ->
+  customize: (configId, callback, proc) ->
+    configPath = "#{@props.rimeDirectory}/#{configId}.custom.yaml"
+    c = new Customizer
+    finish = (c) ->
+      proc c
+      c.saveFile configPath, (err) -> callback err
+    fs.exists configPath, (exists) ->
+      if exists
+        c.loadFile configPath, finish
+      else
+        finish c

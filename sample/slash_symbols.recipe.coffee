@@ -13,7 +13,7 @@ cook new Recipe
       required: true
     }
   ]
-  setup: ->
-    @customize @params['schema'], (c) ->
+  setup: (done) ->
+    @customize @params['schema'], done, (c) ->
       c.patch 'punctuator/import_preset', 'symbols'
       c.patch 'recognizer/patterns/punct', '^/[a-z]*$'

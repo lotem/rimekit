@@ -14,6 +14,6 @@ cook new Recipe
       required: true
     }
   ]
-  setup: ->
-    @customize @params['distro'], (c) ->
+  setup: (done) ->
+    @customize @params['distro'], done, (c) ->
       c.patch 'style/horizontal', true
