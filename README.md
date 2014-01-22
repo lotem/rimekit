@@ -23,7 +23,7 @@ grunt run
 
 ## La brise
 
-The collabrative Rime schema repository.
+The collaborative Rime schema repository.
 
 Input schemata and configuration scripts are available as recipes.
 
