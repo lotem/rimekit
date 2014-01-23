@@ -61,7 +61,8 @@ exports.Recipe = class Recipe
       callback()
       return
     # TODO:
-    download_dir = 'download/'
+    download_dir = "#{@props.rimeDirectory}/download/"
+    fs.mkdirSync download_dir unless fs.existsSync download_dir
     total = @props.files.length
     success = failure = 0
     finish = ->
