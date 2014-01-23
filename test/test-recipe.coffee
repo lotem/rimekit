@@ -74,12 +74,13 @@ exports.recipeCustomize =
 
 exports.testRecipeDownload = (test) ->
   recipe = new rime.Recipe
-    name: 'test_download'
+    name: 'sample_recipes'
     version: '1.0'
     rimeDirectory: 'test'
     files: [
-      'https://raw.github.com/lotem/brise/master/supplement/ipa_xsampa.schema.yaml'
-      'https://raw.github.com/lotem/brise/master/supplement/ipa_xsampa.dict.yaml'
+      'https://raw.github.com/lotem/rimekit/master/sample/dungfungpuo.recipe.coffee'
+      'https://raw.github.com/lotem/rimekit/master/sample/horizontal_layout.recipe.coffee'
+      'https://raw.github.com/lotem/rimekit/master/sample/slash_symbols.recipe.coffee'
     ]
   recipe.downloadFiles (err) ->
     test.ifError err
