@@ -28,7 +28,8 @@
     "diff": "*",
     "escape-html": "*",
     "firebase": "*",
-    "js-yaml": "*"
+    "js-yaml": "*",
+    "request": "*"
   },
   "optionalDependencies": {
     "windows": "*"

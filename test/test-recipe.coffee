@@ -78,8 +78,8 @@ exports.testRecipeDownload = (test) ->
     version: '1.0'
     rimeDirectory: 'test'
     files: [
-      'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.schema.yaml'
-      'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.dict.yaml'
+      'https://raw.github.com/lotem/brise/master/supplement/ipa_xsampa.schema.yaml'
+      'https://raw.github.com/lotem/brise/master/supplement/ipa_xsampa.dict.yaml'
     ]
   recipe.downloadFiles (err) ->
     test.ifError err
