@@ -71,3 +71,16 @@ exports.recipeCustomize =
     @recipe.customize @recipe.props.name, done, (c) ->
       test.ok c
       c.patch 'foo/bar', 'test'
+
+exports.testRecipeDownload = (test) ->
+  recipe = new rime.Recipe
+    name: 'test_download'
+    version: '1.0'
+    rimeDirectory: 'test'
+    files: [
+      'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.schema.yaml'
+      'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.dict.yaml'
+    ]
+  recipe.downloadFiles (err) ->
+    test.ifError err
+    test.done()

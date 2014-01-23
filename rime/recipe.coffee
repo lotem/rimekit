@@ -72,21 +72,23 @@ exports.Recipe = class Recipe
       else
         callback()
     for file_url in @props.files
-      file_name = url.parse(file_url).pathname.split('/').pop()
-      http.get(file_url, (res) ->
-        console.log "got response: #{res.statusCode}"
-        file = fs.createWriteStream(download_dir + file_name)
-        res.on 'data', (data) ->
-          file.write data
-        res.on 'end', ->
-          file.end()
-          console.log "#{file_name} downloaded to #{download_dir}"
-          ++success
+      do (file_url) ->
+        file_name = url.parse(file_url).pathname.split('/').pop()
+        console.log "downloading #{file_name}"
+        http.get(file_url, (res) ->
+          console.log "got response: #{res.statusCode}"
+          file = fs.createWriteStream(download_dir + file_name)
+          res.on 'data', (data) ->
+            file.write data
+          res.on 'end', ->
+            file.end()
+            console.log "#{file_name} downloaded to #{download_dir}"
+            ++success
+            finish()
+        ).on 'error', (e) ->
+          console.log "got error: #{e.message}"
+          ++failure
           finish()
-      ).on 'error', (e) ->
-        console.log "got error #{e.message}"
-        ++failure
-        finish()
 
   # callback: (err) ->
   installSchema: (schemaId, callback) ->
