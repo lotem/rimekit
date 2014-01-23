@@ -1,4 +1,6 @@
 fs = require 'fs'
+http = require 'http'
+url = require 'url'
 
 # recipe: Recipe or {...}
 # ingredients: {...}
@@ -26,10 +28,7 @@ exports.cook = cook = (recipe, ingredients, callback) ->
         console.error "error cooking recipe: #{e}"
         callback e
         return
-  if recipe.props.files
-    recipe.downloadFiles finish
-  else  # no files needed to download
-    finish()
+  recipe.downloadFiles finish
 
 exports.Recipe = class Recipe
 
@@ -58,8 +57,35 @@ exports.Recipe = class Recipe
 
   # callback: (err) ->
   downloadFiles: (callback) ->
-    # TODO
-    callback()
+    unless @props.files  # no files needed to download
+      callback()
+      return
+    # TODO:
+    download_dir = 'download/'
+    total = @props.files.length
+    success = failure = 0
+    finish = ->
+      return unless success + failure == total
+      if failure
+        callback(new Error "failed to download #{failure}/#{total} files.")
+      else
+        callback()
+    for file_url in @props.files
+      file_name = url.parse(file_url).pathname.split('/').pop()
+      http.get(file_url, (res) ->
+        console.log "got response: #{res.statusCode}"
+        file = fs.createWriteStream(download_dir + file_name)
+        res.on 'data', (data) ->
+          file.write data
+        res.on 'end', ->
+          file.end()
+          console.log "#{file_name} downloaded to #{download_dir}"
+          ++success
+          finish()
+      ).on 'error', (e) ->
+        console.log "got error #{e.message}"
+        ++failure
+        finish()
 
   # callback: (err) ->
   installSchema: (schemaId, callback) ->
