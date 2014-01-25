@@ -53,7 +53,7 @@ exports.Recipe = class Recipe
         throw Error('invalid parameter definition.')
       if param.required and not ingredients[param.name]?
         throw Error("missing ingredient: #{param.name}")
-    # TODO
+    # TODO save parameters
 
   # callback: (err) ->
   downloadFiles: (callback) ->
@@ -94,20 +94,31 @@ exports.Recipe = class Recipe
     # TODO
 
   # callback: (err) ->
+  # edit: (schema_list) ->
+  editSchemaList: (callback, edit) ->
+    @customize 'default', callback, (c) ->
+      list = c.get 'schema_list'
+      edit(list or [])
+
+  # callback: (err) ->
   enableSchema: (schemaId, callback) ->
-    # TODO
+    @editSchemaList callback, (schema_list) ->
+      unless schemaId in schema_list
+        schema_list.push schemaId
 
   # callback: (err) ->
   disableSchema: (schemaId, callback) ->
-    # TODO
+    @editSchemaList callback, (schema_list) ->
+      if ~(index = schema_list.indexOf schemaId)
+        schema_list.splice index, 1
 
   # callback: (err) ->
-  # proc: (customizer) ->
-  customize: (configId, callback, proc) ->
+  # edit: (customizer) ->
+  customize: (configId, callback, edit) ->
     configPath = "#{@props.rimeDirectory}/#{configId}.custom.yaml"
     c = new Customizer
     finish = (c) ->
-      proc c
+      edit c
       c.saveFile configPath, (err) -> callback err
     fs.exists configPath, (exists) ->
       if exists
