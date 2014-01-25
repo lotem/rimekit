@@ -10,8 +10,10 @@ exports.Config = class Config
         console.error "error loading config: #{err}"
         callback null
       else
+        # remove potential BOM character
+        yaml = data.replace /^\ufeff/, ''
         try
-          @root = jsyaml.safeLoad data, filename: filePath
+          @root = jsyaml.safeLoad yaml, filename: filePath
         catch err
           console.error "error loading config: #{err}"
           callback null
