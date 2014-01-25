@@ -6,16 +6,15 @@ exports.testRecipeValidation = (test) ->
   test.throws (-> new rime.Recipe
     name: 'an-invalid-name'
     version: '1.0'
-    rimeDirectory: '.'
   ), Error, 'Should fail for recipe name.'
   test.throws (-> new rime.Recipe
     name: 'a_name'
     version: 1.0
-    rimeDirectory: '.'
   ), Error, 'Should fail for recipe version.'
   test.throws (-> new rime.Recipe
     name: 'a_name'
     version: '1.0'
+    rimeDirectory: './nonexistent/path/3.1415926'
   ), Error, 'Should fail for missing rimeDirectory.'
   test.doesNotThrow (-> new rime.Recipe
     name: 'a_name'
@@ -28,7 +27,6 @@ exports.testParametrizedRecipe = (test) ->
   recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'
-    rimeDirectory: '.'
     params: [
       {name: 'required_param', required: true}
     ]
@@ -36,7 +34,6 @@ exports.testParametrizedRecipe = (test) ->
   recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'
-    rimeDirectory: '.'
     params: [
       {name: 'required_param', required: true}
     ]

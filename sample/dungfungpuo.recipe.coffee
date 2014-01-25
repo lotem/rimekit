@@ -6,9 +6,9 @@ cook new Recipe
   category: 'schema'
   description: '東風破古韻輸入法'
   files: [
-    'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.schema.yaml'
-    'https://github.com/lotem/rime-forge/blob/master/dungfungpuo/dungfungpuo.dict.yaml'
+    'https://raw.github.com/lotem/rime-forge/master/dungfungpuo/dungfungpuo.schema.yaml'
+    'https://raw.github.com/lotem/rime-forge/master/dungfungpuo/dungfungpuo.dict.yaml'
   ]
   setup: (done) ->
-    @installSchema 'dungfungpuo', ->
+    @installSchema 'dungfungpuo', =>
       @enableSchema 'dungfungpuo', done

@@ -1,4 +1,5 @@
 fs = require 'fs'
+path = require 'path'
 request = require 'request'
 url = require 'url'
 
@@ -43,8 +44,8 @@ exports.Recipe = class Recipe
       throw Error('recipe name should be alpha_numeric.')
     unless typeof @props.version is 'string'
       throw Error('recipe version should be string type.')
-    # rime directory
-    unless @props.rimeDirectory and fs.existsSync @props.rimeDirectory
+    @rimeDirectory = @props.rimeDirectory ? '.'
+    unless @rimeDirectory and fs.existsSync @rimeDirectory
       throw Error('Rime directory not accessible.')
 
   collectParams: (ingredients) ->
@@ -60,10 +61,10 @@ exports.Recipe = class Recipe
     unless @props.files  # no files needed to download
       callback()
       return
-    download_dir = "#{@props.rimeDirectory}/download/"
-    fs.mkdirSync download_dir unless fs.existsSync download_dir
-    download_dir += "#{@props.name}/"
-    fs.mkdirSync download_dir unless fs.existsSync download_dir
+    download = "#{@rimeDirectory}/download"
+    fs.mkdirSync download unless fs.existsSync download
+    @downloadDirectory = "#{download}/#{@props.name}"
+    fs.mkdirSync @downloadDirectory unless fs.existsSync @downloadDirectory
     total = @props.files.length
     success = failure = 0
     finish = ->
@@ -72,50 +73,92 @@ exports.Recipe = class Recipe
         callback(new Error "failed to download #{failure}/#{total} files.")
       else
         callback()
-    for file_url in @props.files
-      do (file_url) ->
-        file_name = url.parse(file_url).pathname.split('/').pop()
-        console.log "downloading #{file_name}"
-        request.get(file_url)
+    for fileUrl in @props.files
+      do (fileUrl) =>
+        fileName = url.parse(fileUrl).pathname.split('/').pop()
+        console.log "downloading #{fileName}"
+        dest = "#{@downloadDirectory}/#{fileName}"
+        request.get(fileUrl)
           .on('error', (e) ->
             console.log "got error: #{e.message}"
             ++failure
             finish()
           )
-          .on('end', ->
-            console.log "#{file_name} downloaded to #{download_dir}"
+          .on('end', =>
+            console.log "#{fileName} downloaded to #{@downloadDirectory}"
             ++success
             finish()
           )
-          .pipe(fs.createWriteStream(download_dir + file_name))
+          .pipe fs.createWriteStream(dest)
+
+  # callback: (err) ->
+  copyFile: (src, callback) ->
+      fileName = path.basename src
+      dest = "#{@rimeDirectory}/#{fileName}"
+      fs.createReadStream(src)
+        .on('error', (e) ->
+          console.log "error copying file: #{e.message}"
+          callback e
+        )
+        .on('end', =>
+          console.log "#{fileName} copied to #{@rimeDirectory}"
+          callback()
+        )
+        .pipe fs.createWriteStream(dest)
 
   # callback: (err) ->
   installSchema: (schemaId, callback) ->
-    # TODO
+    unless @downloadDirectory?
+      callback(new Error "no files to install for schema '#{schemaId}'")
+      return
+    schemaFile = "#{@downloadDirectory}/#{schemaId}.schema.yaml"
+    files = [schemaFile]
+    c = new Config
+    c.loadFile schemaFile, (c) =>
+      unless c?
+        callback(new Error "unable to load schema from #{schemaFile}")
+        return
+      dictId = c.get 'translator/dictionary'
+      if dictId
+        dictFile = "#{@downloadDirectory}/#{dictId}.dict.yaml"
+        if fs.existsSync dictFile
+          files.push dictFile
+      # install files
+      total = files.length
+      success = failure = 0
+      for file in files
+        @copyFile file, (err) ->
+          if err then ++failure else ++success
+          return unless success + failure == total
+          if failure
+            callback(new Error "failed to copy #{failure}/#{total} files.")
+          else
+            callback()
 
   # callback: (err) ->
-  # edit: (schema_list) ->
+  # edit: (schemaList) ->
   editSchemaList: (callback, edit) ->
     @customize 'default', callback, (c) ->
-      list = c.get 'schema_list'
-      edit(list or [])
+      list = c.root.patch['schema_list'] or []
+      edit list
+      c.patch 'schema_list', list
 
   # callback: (err) ->
   enableSchema: (schemaId, callback) ->
-    @editSchemaList callback, (schema_list) ->
-      unless schemaId in schema_list
-        schema_list.push schemaId
+    @editSchemaList callback, (schemaList) ->
+      unless schemaId in schemaList
+        schemaList.push schemaId
 
   # callback: (err) ->
   disableSchema: (schemaId, callback) ->
-    @editSchemaList callback, (schema_list) ->
-      if ~(index = schema_list.indexOf schemaId)
-        schema_list.splice index, 1
+    @editSchemaList callback, (schemaList) ->
+      if ~(index = schemaList.indexOf schemaId)
+        schemaList.splice index, 1
 
   # callback: (err) ->
   # edit: (customizer) ->
   customize: (configId, callback, edit) ->
-    configPath = "#{@props.rimeDirectory}/#{configId}.custom.yaml"
+    configPath = "#{@rimeDirectory}/#{configId}.custom.yaml"
     c = new Customizer
     finish = (c) ->
       edit c
