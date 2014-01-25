@@ -23,7 +23,7 @@ exports.UserCoffeeScript = class UserCoffeeScript extends UserScript
     coffee = require 'coffee-script'
     @script = vm.createScript(coffee.compile @code)
 
-exports.runUserScript = (filePath, callback) ->
+exports.runUserScript = (filePath, ingredients, callback) ->
   script = new (
     if path.extname(filePath) is '.coffee' then UserCoffeeScript else UserScript
   )
@@ -33,7 +33,10 @@ exports.runUserScript = (filePath, callback) ->
       return
     try
       script.compile()
-      sandbox = exports
+      sandbox = {}
+      for key, value of exports
+        sandbox[key] = value
+      sandbox.ingredients = ingredients
       script.run sandbox
     catch e
       callback e

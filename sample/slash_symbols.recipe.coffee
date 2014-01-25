@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-cook new Recipe
+recipe = new Recipe
   name: 'slash_symbols'
   version: '1.0'
   category: 'settings'
@@ -17,3 +17,5 @@ cook new Recipe
     @customize @params['schema'], done, (c) ->
       c.patch 'punctuator/import_preset', 'symbols'
       c.patch 'recognizer/patterns/punct', '^/[a-z]*$'
+
+cook recipe, ingredients

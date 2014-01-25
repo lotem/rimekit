@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-cook new Recipe
+recipe = new Recipe
   name: 'horizontal_layout'
   version: '1.0'
   category: 'settings'
@@ -17,3 +17,5 @@ cook new Recipe
   setup: (done) ->
     @customize @params['distro'], done, (c) ->
       c.patch 'style/horizontal', true
+
+cook recipe, ingredients

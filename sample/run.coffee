@@ -1,8 +1,25 @@
 rime = require '../app.nw/rime'
+path = require 'path'
 
-if process.argv.length < 3
-  console.log 'missing script file.'
+argv = process.argv
+
+if argv.length < 3
+  console.log "usage: #{argv[0]} #{path.basename argv[1]} recipe [key=value ...]"
   process.exit 1
 
-rime.runUserScript process.argv[2], (err) ->
-  console.log err if err
+recipeScript = argv[2]
+console.log "recipe: #{recipeScript}"
+
+ingredients = {}
+for x in argv.slice(3)
+  [k, v] = x.split '='
+  unless k and v
+    console.error "invalid ingredient: #{x}"
+  ingredients[k] = v
+console.log "ingredients: #{JSON.stringify ingredients}"
+
+rime.runUserScript recipeScript, ingredients, (err) ->
+  if err
+    console.error err
+  else
+    console.log 'done.'

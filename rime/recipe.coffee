@@ -49,11 +49,14 @@ exports.Recipe = class Recipe
       throw Error('Rime directory not accessible.')
 
   collectParams: (ingredients) ->
+    @params ?= {}
     for param in @props.params
       unless param and typeof param is 'object'
         throw Error('invalid parameter definition.')
-      if param.required and not ingredients[param.name]?
-        throw Error("missing ingredient: #{param.name}")
+      name = param.name
+      if param.required and not ingredients[name]?
+        throw Error("missing ingredient: #{name}")
+      @params[name] = ingredients[name]
     # TODO save parameters
 
   # callback: (err) ->
