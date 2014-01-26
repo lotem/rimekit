@@ -69,6 +69,7 @@ exports.recipeCustomize =
       test.ok c
       c.patch 'foo/bar', 'test'
 
+###
 exports.testRecipeDownload = (test) ->
   recipe = new rime.Recipe
     name: 'sample_recipes'
@@ -82,3 +83,4 @@ exports.testRecipeDownload = (test) ->
   recipe.downloadFiles (err) ->
     test.ifError err
     test.done()
+###
