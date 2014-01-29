@@ -15,19 +15,22 @@ recipe = new Recipe
   setup: (done) ->
     schemaId = @params['schema']
     s = new Config
-    s.loadFile "#{@rimeDirectory}/#{schemaId}schema.yaml", (s) =>
-      main_translators = [
-        'reverse_lookup_translator'
-        'table_translator'
-        'script_translator'
+    s.loadFile "#{@rimeDirectory}/#{schemaId}.schema.yaml", (s) =>
+      mainTranslators = [
+        /^reverse_lookup_translator/
+        /^script_translator/
+        /^table_translator/
       ]
+      customPhraseTranslator = 'table_translator@custom_phrase'
       translators = s.get 'engine/translators'
-      index = 0
-      for t in translators
-        if t in main_translators  # TODO: handle those with aliases
-          break
-        ++index
-      translators.insert index, 'table_translator@custom_phrase'
+      unless customPhraseTranslator in translators
+        # insert custom phrase translator before main translators
+        index = 0
+        for x in translators
+          if mainTranslators.some((elem) -> elem.test x)
+            break
+          ++index
+        translators.splice index, 0, customPhraseTranslator
       @customize schemaId, done, (c) ->
         c.patch 'engine/translators', translators
         c.patch 'custom_phrase',
