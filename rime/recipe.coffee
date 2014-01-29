@@ -96,18 +96,18 @@ exports.Recipe = class Recipe
 
   # callback: (err) ->
   copyFile: (src, callback) ->
-      fileName = path.basename src
-      dest = "#{@rimeDirectory}/#{fileName}"
-      fs.createReadStream(src)
-        .on('error', (e) ->
-          console.log "error copying file: #{e.message}"
-          callback e
-        )
-        .on('end', =>
-          console.log "#{fileName} copied to #{@rimeDirectory}"
-          callback()
-        )
-        .pipe fs.createWriteStream(dest)
+    fileName = path.basename src
+    dest = "#{@rimeDirectory}/#{fileName}"
+    fs.createReadStream(src)
+      .on('error', (e) ->
+        console.log "error copying file: #{e.message}"
+        callback e
+      )
+      .on('end', =>
+        console.log "#{fileName} copied to #{@rimeDirectory}"
+        callback()
+      )
+      .pipe fs.createWriteStream(dest)
 
   # callback: (err) ->
   installSchema: (schemaId, callback) ->
