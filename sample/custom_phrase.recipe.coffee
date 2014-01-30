@@ -15,7 +15,10 @@ recipe = new Recipe
   setup: (done) ->
     schemaId = @params['schema']
     s = new Config
-    s.loadFile "#{@rimeDirectory}/#{schemaId}.schema.yaml", (s) =>
+    s.loadFile "#{@rimeDirectory}/#{schemaId}.schema.yaml", (err) =>
+      if err
+        done err
+        return
       mainTranslators = [
         /^r10n_translator/
         /^reverse_lookup_translator/

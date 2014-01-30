@@ -61,8 +61,8 @@ exports.recipeCustomize =
     done = (err) =>
       test.ifError err
       c = new rime.Config
-      c.loadFile @configPath, (c) ->
-        test.ok c
+      c.loadFile @configPath, (err) ->
+        test.ifError err
         test.equal c.get('patch')['foo/bar'], 'test'
         test.done()
     @recipe.customize @recipe.props.name, done, (c) ->

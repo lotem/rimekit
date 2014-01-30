@@ -117,9 +117,9 @@ exports.Recipe = class Recipe
     schemaFile = "#{@downloadDirectory}/#{schemaId}.schema.yaml"
     files = [schemaFile]
     c = new Config
-    c.loadFile schemaFile, (c) =>
-      unless c?
-        callback(new Error "unable to load schema from #{schemaFile}")
+    c.loadFile schemaFile, (err) =>
+      if err
+        callback err
         return
       dictId = c.get 'translator/dictionary'
       if dictId
@@ -165,9 +165,13 @@ exports.Recipe = class Recipe
     c = new Customizer
     finish = (c) ->
       edit c
-      c.saveFile configPath, (err) -> callback err
+      c.saveFile configPath, callback
     fs.exists configPath, (exists) ->
       if exists
-        c.loadFile configPath, finish
+        c.loadFile configPath, (err) ->
+          if err
+            callback err
+          else
+            finish c
       else
         finish c

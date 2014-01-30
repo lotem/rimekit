@@ -4,11 +4,18 @@ exports.Config = class Config
   constructor: (yaml) ->
     @root = if yaml then jsyaml.safeLoad yaml else null
 
+  loadFileSync: (filePath) ->
+    data = fs.readFileSync filePath, {encoding: 'utf8'}
+    # remove potential BOM character
+    yaml = data.replace /^\ufeff/, ''
+    @root = jsyaml.safeLoad yaml, filename: filePath
+    return @
+
   loadFile: (filePath, callback) ->
     fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
       if err
         console.error "error loading config: #{err}"
-        callback null
+        callback err
       else
         # remove potential BOM character
         yaml = data.replace /^\ufeff/, ''
@@ -16,9 +23,9 @@ exports.Config = class Config
           @root = jsyaml.safeLoad yaml, filename: filePath
         catch err
           console.error "error loading config: #{err}"
-          callback null
+          callback err
           return
-        callback @
+        callback()
 
   saveFile: (filePath, callback) ->
     fs.writeFile filePath, @toString(), callback

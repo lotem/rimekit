@@ -105,9 +105,9 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
       @alerts.push type: 'error', msg: '找不到輸入方案'
       return
     config = new rime.Config
-    config.loadFile filePath, (loaded) =>
+    config.loadFile filePath, (err) =>
       @$apply =>
-        unless loaded
+        if err
           @alerts.push type: 'error', msg: '載入輸入方案錯誤'
           return
         @dictName = config.get 'translator/dictionary' ? ''
