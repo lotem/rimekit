@@ -17,6 +17,7 @@ recipe = new Recipe
     s = new Config
     s.loadFile "#{@rimeDirectory}/#{schemaId}.schema.yaml", (s) =>
       mainTranslators = [
+        /^r10n_translator/
         /^reverse_lookup_translator/
         /^script_translator/
         /^table_translator/
