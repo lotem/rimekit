@@ -14,11 +14,12 @@ recipe = new Recipe
   ]
   setup: (done) ->
     schemaId = @params['schema']
+    schemaFile = @findConfigFile "#{schemaId}.schema.yaml"
+    unless schemaFile
+      done new Error "schema '#{schemaId}' could not be found."
+      return
     s = new Config
-    s.loadFile "#{@rimeDirectory}/#{schemaId}.schema.yaml", (err) =>
-      if err
-        done err
-        return
+    s.loadFile schemaFile, (err) =>
       mainTranslators = [
         /^r10n_translator/
         /^reverse_lookup_translator/

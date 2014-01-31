@@ -47,6 +47,7 @@ exports.Recipe = class Recipe
     @rimeDirectory = @props.rimeDirectory ? '.'
     unless @rimeDirectory and fs.existsSync @rimeDirectory
       throw Error('Rime directory not accessible.')
+    @fallbackDirectory = @props.fallbackDirectory ? '.'
 
   collectParams: (ingredients) ->
     @params ?= {}
@@ -138,11 +139,31 @@ exports.Recipe = class Recipe
           else
             callback()
 
+  findConfigFile: (fileName) ->
+    path = "#{@rimeDirectory}/#{fileName}"
+    if fs.existsSync path
+      c = new Config
+      try
+        c.loadFileSync path
+        unless typeof c.get('customization') is 'number'
+          return path
+      catch e
+    path = "#{@fallbackDirectory}/#{fileName}"
+    if fs.existsSync path
+      return path
+    null
+
+  getDefaultSchemaList: ->
+    c = new Config
+    c.loadFile @findConfigFile('default.yaml'), (err) ->
+      return [] if err
+      c.get('schema_list') or []
+
   # callback: (err) ->
   # edit: (schemaList) ->
   editSchemaList: (callback, edit) ->
-    @customize 'default', callback, (c) ->
-      list = c.root.patch['schema_list'] or []
+    @customize 'default', callback, (c) =>
+      list = c.root.patch['schema_list'] or @getDefaultSchemaList()
       edit list
       c.patch 'schema_list', list
 
