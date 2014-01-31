@@ -152,9 +152,10 @@ exports.Recipe = class Recipe
         unless typeof c.get('customization') is 'number'
           return path
       catch e
-    path = "#{@rimeSharedDir}/#{fileName}"
-    if fs.existsSync path
-      return path
+    if @rimeSharedDir != @rimeUserDir
+      path = "#{@rimeSharedDir}/#{fileName}"
+      if fs.existsSync path
+        return path
     null
 
   getDefaultSchemaList: ->
