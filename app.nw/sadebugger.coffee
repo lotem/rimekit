@@ -85,7 +85,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     'reverse_lookup/comment_format'
   ]
 
-  $scope.rimeDirectory = rimekitService.rimeDirectory
+  $scope.rimeUserDir = rimekitService.rimeUserDir
   $scope.schemaId = 'luna_pinyin'
   $scope.configKey = 'speller/algebra'
   $scope.rules = []
@@ -99,7 +99,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     @syllabary = []
     @alerts.length = 0
     return unless @schemaId && @configKey
-    filePath = "#{@rimeDirectory ? '.'}/#{@schemaId}.schema.yaml"
+    filePath = "#{@rimeUserDir ? '.'}/#{@schemaId}.schema.yaml"
     unless fs.existsSync filePath
       console.warn "file does not exist: #{filePath}"
       @alerts.push type: 'error', msg: '找不到輸入方案'
@@ -124,7 +124,7 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     @syllabary = []
     @alerts.length = 0
     return unless @dictName
-    filePath = "#{@rimeDirectory ? '.'}/#{@dictName}.table.bin"
+    filePath = "#{@rimeUserDir ? '.'}/#{@dictName}.table.bin"
     table = new rime.Table
     table.loadFile filePath, (syllabary) =>
       @$apply =>

@@ -14,12 +14,12 @@ exports.testRecipeValidation = (test) ->
   test.throws (-> new rime.Recipe
     name: 'a_name'
     version: '1.0'
-    rimeDirectory: './nonexistent/path/3.1415926'
-  ), Error, 'Should fail for missing rimeDirectory.'
+    rimeUserDir: './nonexistent/path/3.1415926'
+  ), Error, 'Should fail when missing rimeUserDir.'
   test.doesNotThrow (-> new rime.Recipe
     name: 'a_name'
     version: '1.0'
-    rimeDirectory: '.'
+    rimeUserDir: '.'
   ), Error, 'Should pass recipe validation.'
   test.done()
 
@@ -46,8 +46,8 @@ exports.recipeCustomize =
     @recipe = new rime.Recipe
       name: 'test_recipe_customize'
       version: '1.0'
-      rimeDirectory: 'test'
-    @configPath = "#{@recipe.props.rimeDirectory}/#{@recipe.props.name}.custom.yaml"
+      rimeUserDir: 'test'
+    @configPath = "#{@recipe.props.rimeUserDir}/#{@recipe.props.name}.custom.yaml"
     if fs.existsSync @configPath
       fs.unlinkSync @configPath
     callback()
@@ -74,7 +74,7 @@ exports.testRecipeDownload = (test) ->
   recipe = new rime.Recipe
     name: 'sample_recipes'
     version: '1.0'
-    rimeDirectory: 'test'
+    rimeUserDir: 'test'
     files: [
       'https://raw.github.com/lotem/rimekit/master/sample/dungfungpuo.recipe.coffee'
       'https://raw.github.com/lotem/rimekit/master/sample/horizontal_layout.recipe.coffee'

@@ -44,10 +44,10 @@ exports.Recipe = class Recipe
       throw Error('recipe name should be alpha_numeric.')
     unless typeof @props.version is 'string'
       throw Error('recipe version should be string type.')
-    @rimeDirectory = @props.rimeDirectory ? '.'
-    unless @rimeDirectory and fs.existsSync @rimeDirectory
+    @rimeUserDir = @props.rimeUserDir ? '.'
+    unless @rimeUserDir and fs.existsSync @rimeUserDir
       throw Error('Rime directory not accessible.')
-    @fallbackDirectory = @props.fallbackDirectory ? '.'
+    @rimeSharedDir = @props.rimeSharedDir ? '.'
 
   collectParams: (ingredients) ->
     @params ?= {}
@@ -65,7 +65,7 @@ exports.Recipe = class Recipe
     unless @props.files  # no files needed to download
       callback()
       return
-    download = "#{@rimeDirectory}/download"
+    download = "#{@rimeUserDir}/download"
     fs.mkdirSync download unless fs.existsSync download
     @downloadDirectory = "#{download}/#{@props.name}"
     fs.mkdirSync @downloadDirectory unless fs.existsSync @downloadDirectory
@@ -98,14 +98,14 @@ exports.Recipe = class Recipe
   # callback: (err) ->
   copyFile: (src, callback) ->
     fileName = path.basename src
-    dest = "#{@rimeDirectory}/#{fileName}"
+    dest = "#{@rimeUserDir}/#{fileName}"
     fs.createReadStream(src)
       .on('error', (e) ->
         console.log "error copying file: #{e.message}"
         callback e
       )
       .on('end', =>
-        console.log "#{fileName} copied to #{@rimeDirectory}"
+        console.log "#{fileName} copied to #{@rimeUserDir}"
         callback()
       )
       .pipe fs.createWriteStream(dest)
@@ -140,7 +140,7 @@ exports.Recipe = class Recipe
             callback()
 
   findConfigFile: (fileName) ->
-    path = "#{@rimeDirectory}/#{fileName}"
+    path = "#{@rimeUserDir}/#{fileName}"
     if fs.existsSync path
       c = new Config
       try
@@ -148,7 +148,7 @@ exports.Recipe = class Recipe
         unless typeof c.get('customization') is 'number'
           return path
       catch e
-    path = "#{@fallbackDirectory}/#{fileName}"
+    path = "#{@rimeSharedDir}/#{fileName}"
     if fs.existsSync path
       return path
     null
@@ -182,7 +182,7 @@ exports.Recipe = class Recipe
   # callback: (err) ->
   # edit: (customizer) ->
   customize: (configId, callback, edit) ->
-    configPath = "#{@rimeDirectory}/#{configId}.custom.yaml"
+    configPath = "#{@rimeUserDir}/#{configId}.custom.yaml"
     c = new Customizer
     finish = (c) ->
       edit c

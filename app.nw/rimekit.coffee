@@ -7,22 +7,34 @@ customRimeUserDir = ->
     console.warn 'could not access Windows registry.'
   key?.RimeUserDir?.value
 
+weaselInstallDir = ->
+  try
+    key = require('windows')?.registry('HKLM/Software/Rime/Weasel')
+  catch
+    console.warn 'could not access Windows registry.'
+  key?.WeaselRoot?.value
+
 app.factory 'rimekitService', ->
   console.log "version: #{process.version}"
   console.log "platform: #{process.platform}"
   if process.platform == 'darwin'
     home = process.env['HOME'] ? '.'
-    rimeDirectory = "#{home}/Library/Rime"
+    rimeUserDir = "#{home}/Library/Rime"
+    rimeSharedDir = "/Library/Input Methods/Squirrel.app/Contents/SharedSupport"
   else if process.platform == 'linux'
     home = process.env['HOME'] ? '.'
-    rimeDirectory = "#{home}/.config/ibus/rime"
+    rimeUserDir = "#{home}/.config/ibus/rime"
+    rimeSharedDir = "/usr/share/rime-data"
   else if process.platform == 'win32'
     appdata = process.env['APPDATA']
-    rimeDirectory = customRimeUserDir() or "#{appdata}\\Rime"
-  console.log "Rime directory: #{rimeDirectory}"
+    rimeUserDir = customRimeUserDir() or "#{appdata}\\Rime"
+    rimeSharedDir = "#{weaselInstallDir()}\\data"
+  console.log "Rime user directory: #{rimeUserDir}"
+  console.log "Rime shared directory: #{rimeSharedDir}"
   nodeVersion: process.version
   platform: process.platform
-  rimeDirectory: rimeDirectory
+  rimeUserDir: rimeUserDir
+  rimeSharedDir: rimeSharedDir
 
 app.controller 'MainCtrl', ($scope) ->
   $scope.tabs =
