@@ -33,21 +33,25 @@ exports.cook = cook = (recipe, ingredients, callback) ->
 
 exports.Recipe = class Recipe
 
+  @rimeUserDir: '.'
+
+  @rimeSharedDir: '.'
+
   constructor: (@props) ->
     @validate()
 
   validate: ->
     # name and version are required
-    throw Error('missing recipe name.') unless @props.name
-    throw Error('missing recipe version.') unless @props.version
+    throw Error 'missing recipe name.' unless @props.name
+    throw Error 'missing recipe version.' unless @props.version
     unless /^[_0-9A-Za-z]+$/.test @props.name
-      throw Error('recipe name should be alpha_numeric.')
+      throw Error 'recipe name should be alpha_numeric.'
     unless typeof @props.version is 'string'
-      throw Error('recipe version should be string type.')
-    @rimeUserDir = @props.rimeUserDir ? '.'
+      throw Error 'recipe version should be string type.'
+    @rimeUserDir = @props.rimeUserDir ? Recipe.rimeUserDir
     unless @rimeUserDir and fs.existsSync @rimeUserDir
-      throw Error('Rime directory not accessible.')
-    @rimeSharedDir = @props.rimeSharedDir ? '.'
+      throw Error 'Rime user directory not accessible.'
+    @rimeSharedDir = @props.rimeSharedDir ? Recipe.rimeSharedDir
 
   collectParams: (ingredients) ->
     @params ?= {}
