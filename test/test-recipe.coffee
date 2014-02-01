@@ -24,6 +24,7 @@ exports.testRecipeValidation = (test) ->
   test.done()
 
 exports.testParametrizedRecipe = (test) ->
+  rime.recipes.autoSave = false
   recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'

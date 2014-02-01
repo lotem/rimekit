@@ -3,6 +3,67 @@ path = require 'path'
 request = require 'request'
 url = require 'url'
 
+exports.RecipeList = class RecipeList
+
+  constructor: (@fileName = 'recipes.yaml')->
+    @loaded = false
+    @loading = false
+    @list = []
+    @pending = []
+    @autoSave = true
+
+  schedule: (work) ->
+    @pending.push work
+    if @loading
+      return
+    doPendingWork = =>
+      while @pending.length != 0
+        @pending.shift()()
+      @save() if @autoSave
+    if @loaded
+      doPendingWork()
+    else
+      @load (err) =>
+        throw err if err
+        doPendingWork()
+
+  load: (callback) ->
+    filePath = "#{Recipe.rimeUserDir}/#{@fileName}"
+    c = new Config
+    finish = =>
+      @loaded = true
+      @list = c.get('recipes') or []
+      callback()
+    if fs.existsSync filePath
+      @loading = true
+      c.loadFile filePath, (err) =>
+        @loading = false
+        if err
+          callback err
+          return
+        finish()
+    else
+      finish()
+
+  save: (callback) ->
+    filePath = "#{Recipe.rimeUserDir}/#{@fileName}"
+    c = new Config
+    c.set 'recipes', @list
+    c.saveFile filePath, callback
+
+  clear: ->
+    @schedule =>
+      @list = []
+
+  add: (recipe) ->
+    @schedule =>
+      @list.push
+        name: recipe.props.name
+        version: recipe.props.version
+        params: recipe.params
+
+exports.recipes = recipes = new RecipeList
+
 # recipe: Recipe or {...}
 # ingredients: {...}
 # callback: (err) ->
@@ -15,7 +76,7 @@ exports.cook = cook = (recipe, ingredients, callback) ->
     if recipe.props.params
       recipe.collectParams(ingredients ? {})
   catch e
-    console.error "error cooking recipe: #{e}"
+    console.error "error parsing recipe: #{e}"
     callback e
     return
   finish = (err) ->
@@ -31,6 +92,8 @@ exports.cook = cook = (recipe, ingredients, callback) ->
         return
     else
       callback()
+    # save recipe list
+    recipes.add recipe
   recipe.downloadFiles finish
 
 exports.Recipe = class Recipe
@@ -64,7 +127,6 @@ exports.Recipe = class Recipe
       if param.required and not ingredients[name]?
         throw Error("missing ingredient: #{name}")
       @params[name] = ingredients[name]
-    # TODO save parameters
 
   # callback: (err) ->
   downloadFiles: (callback) ->
