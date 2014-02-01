@@ -29,6 +29,8 @@ exports.cook = cook = (recipe, ingredients, callback) ->
         console.error "error cooking recipe: #{e}"
         callback e
         return
+    else
+      callback()
   recipe.downloadFiles finish
 
 exports.Recipe = class Recipe
