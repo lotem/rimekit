@@ -12,6 +12,9 @@ recipe = new Recipe
       required: true
     }
   ]
+  files: [
+    'https://gist.github.com/lotem/5440677/raw/custom_phrase.txt'
+  ]
   setup: (done) ->
     schemaId = @params['schema']
     schemaFile = @findConfigFile "#{schemaId}.schema.yaml"
