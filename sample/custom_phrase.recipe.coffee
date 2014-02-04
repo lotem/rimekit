@@ -48,5 +48,7 @@ recipe = new Recipe
           enable_completion: false
           enable_sentence: false
           initial_quality: 1
+      @copyFile "#{@downloadDirectory}/custom_phrase.txt", (err) ->
+        console.error err if err
 
 cook recipe, ingredients

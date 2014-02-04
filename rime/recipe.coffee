@@ -208,18 +208,18 @@ exports.Recipe = class Recipe
             callback()
 
   findConfigFile: (fileName) ->
-    path = "#{@rimeUserDir}/#{fileName}"
-    if fs.existsSync path
+    filePath = "#{@rimeUserDir}/#{fileName}"
+    if fs.existsSync filePath
       c = new Config
       try
-        c.loadFileSync path
+        c.loadFileSync filePath
         unless typeof c.get('customization') is 'number'
-          return path
+          return filePath
       catch e
     if @rimeSharedDir != @rimeUserDir
-      path = "#{@rimeSharedDir}/#{fileName}"
-      if fs.existsSync path
-        return path
+      filePath = "#{@rimeSharedDir}/#{fileName}"
+      if fs.existsSync filePath
+        return filePath
     null
 
   getDefaultSchemaList: ->
