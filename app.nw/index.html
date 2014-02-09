@@ -3,11 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title>Rime 工具箱</title>
-  <script src="angular.min.js"></script>
-  <script src="ui-bootstrap-tpls.min.js"></script>
-  <script src="rimekit.js"></script>
   <link rel="stylesheet" href="bootstrap.min.css">
   <link rel="stylesheet" href="rimekit.css">
+  <script src="angular.min.js"></script>
+  <script src="ui-bootstrap-tpls.min.js"></script>
+  <script type="text/javascript">
+    var app = angular.module('rimekit', ['ui.bootstrap']);
+  </script>
+  <script src="rimekit.js"></script>
 </head>
 <body>
   <div ng-controller="MainCtrl">

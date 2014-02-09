@@ -1,4 +1,5 @@
-app = angular.module 'rimekit', ['ui.bootstrap']
+# done in index.html instead
+#app = angular.module 'rimekit', ['ui.bootstrap']
 
 customRimeUserDir = ->
   try
