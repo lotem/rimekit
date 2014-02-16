@@ -17,16 +17,19 @@
     <tabset>
       <tab heading="起始頁">
         <div class="hero-unit">
-          <h2>Rime 工具箱</h2>
-          <p>Rime 輸入法設定及輸入方案創作工具。</p>
-          <ul class="nav nav-pills nav-stacked">
-            <li ng-class="{disabled: tab.disabled}" ng-repeat="tab in tabs">
-              <a ng-click="tab.active = true">{{tab.title}}</a>
+          <h2>Rime 工具箱
+            <small>輸入法設定及輸入方案創作工具</small>
+          </h2>
+        </div>
+        <div>
+          <ul class="inline nav nav-pills">
+            <li>
+              <a href="http://code.google.com/p/rimeime/">Rime 項目主頁</a>
+            </li>
+            <li>
+              <a href="http://rimeime.github.io">Rime 部落格</a>
             </li>
           </ul>
-          <p>
-            <a class="btn btn-primary btn-large" href="http://rimeime.github.io">Rime 主頁</a>
-          </p>
         </div>
       </tab>
       <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
