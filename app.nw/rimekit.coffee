@@ -45,3 +45,8 @@ app.controller 'MainCtrl', ($scope) ->
     sadebugger:
       title: '拼寫運算調試器'
       source: 'sadebugger.html'
+  $scope.links =
+    blog: 'http://rimeime.github.io'
+    project: 'http://code.google.com/p/rimeime/'
+  $scope.openLink = (url) ->
+    require('nw.gui').Shell.openExternal url
