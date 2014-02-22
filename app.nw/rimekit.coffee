@@ -39,12 +39,17 @@ app.factory 'rimekitService', ->
 
 app.controller 'MainCtrl', ($scope) ->
   $scope.tabs =
-    brise:
+    b_brise:
       title: '東風破.net'
       source: 'brise.html'
-    sadebugger:
+    c_sadebugger:
       title: '拼寫運算調試器'
       source: 'sadebugger.html'
+    d_cseditor:
+      title: '配色編輯器'
+    e_credits:
+      title: '創作者'
+      source: 'credits.html'
   $scope.links =
     blog: 'http://rimeime.github.io'
     project: 'http://code.google.com/p/rimeime/'
