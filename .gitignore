@@ -4,3 +4,5 @@
 /app.nw/rime.js
 /app.nw/rimekit.js
 /test/download/
+/sample/download/
+/sample/*.yaml
