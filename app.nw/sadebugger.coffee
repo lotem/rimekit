@@ -105,11 +105,9 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
       @alerts.push type: 'error', msg: '找不到輸入方案'
       return
     config = new rime.Config
-    config.loadFile filePath, (err) =>
+    config.loadFile(filePath)
+    .then =>
       @$apply =>
-        if err
-          @alerts.push type: 'error', msg: '載入輸入方案錯誤'
-          return
         @dictName = config.get 'translator/dictionary' ? ''
         rules = config.get @configKey
         @rules = (new rime.Rule(x) for x in rules) if rules
@@ -119,6 +117,9 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
         @isProjector = @configKey.match(/\/algebra$/) != null
         @isFormatter = @configKey.match(/format$/) != null
         @calculate()
+    .catch (err) =>
+      @$apply =>
+        @alerts.push type: 'error', msg: '載入輸入方案錯誤'
 
   $scope.loadDict = ->
     @syllabary = []
@@ -126,14 +127,15 @@ app.controller 'AlgebraCtrl', ($scope, rimekitService) ->
     return unless @dictName
     filePath = "#{@rimeUserDir ? '.'}/#{@dictName}.table.bin"
     table = new rime.Table
-    table.loadFile filePath, (syllabary) =>
+    table.loadFile(filePath)
+    .then =>
       @$apply =>
-        unless syllabary
-          @alerts.push type: 'error', msg: '載入詞典錯誤'
-          return
-        @syllabary = syllabary
+        @syllabary = table.syllabary
         console.log "#{@syllabary.length} syllables loaded."
         @calculate()
+    .catch (err) =>
+      @$apply =>
+        @alerts.push type: 'error', msg: '載入詞典錯誤'
 
   $scope.calculate = ->
     if @rules.length == 0

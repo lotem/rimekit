@@ -15,14 +15,16 @@ recipe = new Recipe
   files: [
     'https://gist.github.com/lotem/5440677/raw/custom_phrase.txt'
   ]
-  setup: (done) ->
+  setup: ->
     schemaId = @params['schema']
     schemaFile = @findConfigFile "#{schemaId}.schema.yaml"
     unless schemaFile
-      done new Error "schema '#{schemaId}' could not be found."
-      return
+      return Promise.reject(
+        new Error "schema '#{schemaId}' could not be found."
+      )
     s = new Config
-    s.loadFile schemaFile, (err) =>
+    s.loadFile(schemaFile)
+    .then =>
       mainTranslators = [
         /^r10n_translator/
         /^reverse_lookup_translator/
@@ -39,7 +41,7 @@ recipe = new Recipe
             break
           ++index
         translators.splice index, 0, customPhraseTranslator
-      @customize schemaId, done, (c) ->
+      @customize schemaId, (c) ->
         c.patch 'engine/translators', translators
         c.patch 'custom_phrase',
           dictionary: ''
@@ -48,7 +50,7 @@ recipe = new Recipe
           enable_completion: false
           enable_sentence: false
           initial_quality: 1
-      @copyFile "#{@downloadDirectory}/custom_phrase.txt", (err) ->
-        console.error err if err
+    .then =>
+      @copyFile "#{@downloadDirectory}/custom_phrase.txt"
 
 cook recipe, ingredients

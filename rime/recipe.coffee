@@ -27,29 +27,31 @@ exports.RecipeList = class RecipeList
         throw err if err
         doPendingWork()
 
-  load: (callback) ->
-    filePath = "#{Recipe.rimeUserDir}/#{@fileName}"
-    c = new Config
-    finish = =>
-      @loaded = true
-      @list = c.get('recipes') or []
-      callback()
-    if fs.existsSync filePath
-      @loading = true
-      c.loadFile filePath, (err) =>
+  load: ->
+    new Promise (resolve, reject) =>
+      filePath = "#{Recipe.rimeUserDir}/#{@fileName}"
+      c = new Config
+      (
+        if fs.existsSync filePath
+          @loading = true
+          c.loadFile(filePath)
+        else
+          Promise.resolve()
+      )
+      .then =>
         @loading = false
-        if err
-          callback err
-          return
-        finish()
-    else
-      finish()
+        @loaded = true
+        @list = c.get('recipes') or []
+        resolve()
+      .catch (err) =>
+        @loading = false
+        reject err
 
-  save: (callback) ->
+  save: ->
     filePath = "#{Recipe.rimeUserDir}/#{@fileName}"
     c = new Config
     c.set 'recipes', @list
-    c.saveFile filePath, callback
+    c.saveFile filePath
 
   clear: ->
     @schedule =>
@@ -66,10 +68,7 @@ exports.recipes = recipes = new RecipeList
 
 # recipe: Recipe or {...}
 # ingredients: {...}
-# callback: (err) ->
-exports.cook = cook = (recipe, ingredients, callback) ->
-  # if no callback is given, throw errors
-  callback ?= (err) -> throw err if err
+exports.cook = cook = (recipe, ingredients) ->
   try
     unless recipe instanceof Recipe  # cook {...}, ...
       recipe = new Recipe recipe
@@ -77,24 +76,17 @@ exports.cook = cook = (recipe, ingredients, callback) ->
       recipe.collectParams(ingredients ? {})
   catch e
     console.error "error parsing recipe: #{e}"
-    callback e
-    return
-  finish = (err) ->
-    if (err)
-      callback err
-      return
+    return Promise.reject e
+  recipe.downloadFiles()
+  .then ->
     if recipe.props.setup
-      try
-        recipe.props.setup.call recipe, callback
-      catch e
-        console.error "error cooking recipe: #{e}"
-        callback e
-        return
-    else
-      callback()
+      recipe.props.setup.call recipe
+  .then ->
     # save recipe list
     recipes.add recipe
-  recipe.downloadFiles finish
+  .catch (e) ->
+    console.error "error cooking recipe: #{e}"
+    return Promise.reject e
 
 exports.Recipe = class Recipe
 
@@ -128,84 +120,62 @@ exports.Recipe = class Recipe
         throw Error("missing ingredient: #{name}")
       @params[name] = ingredients[name]
 
-  # callback: (err) ->
-  downloadFiles: (callback) ->
+  downloadFiles: ->
     unless @props.files  # no files needed to download
-      callback()
-      return
+      return Promise.resolve()
     download = "#{@rimeUserDir}/download"
     fs.mkdirSync download unless fs.existsSync download
     @downloadDirectory = "#{download}/#{@props.name}"
     fs.mkdirSync @downloadDirectory unless fs.existsSync @downloadDirectory
     total = @props.files.length
-    success = failure = 0
-    finish = ->
-      return unless success + failure == total
-      if failure
-        callback(new Error "failed to download #{failure}/#{total} files.")
-      else
-        callback()
-    for fileUrl in @props.files
-      do (fileUrl) =>
+    downloadFile = (fileUrl) =>
+      new Promise (resolve, reject) =>
         fileName = url.parse(fileUrl).pathname.split('/').pop()
         console.log "downloading #{fileName}"
         dest = "#{@downloadDirectory}/#{fileName}"
         request.get(fileUrl)
-          .on('error', (e) ->
-            console.log "got error: #{e.message}"
-            ++failure
-            finish()
-          )
-          .on('end', =>
-            console.log "#{fileName} downloaded to #{@downloadDirectory}"
-            ++success
-            finish()
-          )
-          .pipe fs.createWriteStream(dest)
+        .on('error', (e) ->
+          console.log "failed to download #{fileName}: #{e.message}"
+          reject e
+        )
+        .on('end', =>
+          console.log "#{fileName} downloaded to #{@downloadDirectory}"
+          resolve()
+        )
+        .pipe fs.createWriteStream(dest)
+    Promise.all(@props.files.map downloadFile)
 
-  # callback: (err) ->
-  copyFile: (src, callback) ->
-    fileName = path.basename src
-    dest = "#{@rimeUserDir}/#{fileName}"
-    fs.createReadStream(src)
+  copyFile: (src) ->
+    new Promise (resolve, reject) =>
+      fileName = path.basename src
+      dest = "#{@rimeUserDir}/#{fileName}"
+      fs.createReadStream(src)
       .on('error', (e) ->
         console.log "error copying file: #{e.message}"
-        callback e
+        reject e
       )
       .on('end', =>
         console.log "#{fileName} copied to #{@rimeUserDir}"
-        callback()
+        resolve()
       )
       .pipe fs.createWriteStream(dest)
 
-  # callback: (err) ->
-  installSchema: (schemaId, callback) ->
+  installSchema: (schemaId) ->
     unless @downloadDirectory?
-      callback(new Error "no files to install for schema '#{schemaId}'")
-      return
+      return Promise.reject(
+        new Error "no files to install for schema '#{schemaId}'"
+      )
     schemaFile = "#{@downloadDirectory}/#{schemaId}.schema.yaml"
     files = [schemaFile]
     c = new Config
-    c.loadFile schemaFile, (err) =>
-      if err
-        callback err
-        return
+    c.loadFile(schemaFile)
+    .then =>
       dictId = c.get 'translator/dictionary'
       if dictId
         dictFile = "#{@downloadDirectory}/#{dictId}.dict.yaml"
         if fs.existsSync dictFile
           files.push dictFile
-      # install files
-      total = files.length
-      success = failure = 0
-      for file in files
-        @copyFile file, (err) ->
-          if err then ++failure else ++success
-          return unless success + failure == total
-          if failure
-            callback(new Error "failed to copy #{failure}/#{total} files.")
-          else
-            callback()
+      Promise.all(files.map (x) => @copyFile x)
 
   findConfigFile: (fileName) ->
     filePath = "#{@rimeUserDir}/#{fileName}"
@@ -224,44 +194,46 @@ exports.Recipe = class Recipe
 
   getDefaultSchemaList: ->
     c = new Config
-    c.loadFile @findConfigFile('default.yaml'), (err) ->
-      return [] if err
+    c.loadFile(@findConfigFile 'default.yaml')
+    .then ->
       c.get('schema_list') or []
+    .catch ->
+      []
 
-  # callback: (err) ->
   # edit: (schemaList) ->
-  editSchemaList: (callback, edit) ->
-    @customize 'default', callback, (c) =>
-      list = c.root.patch['schema_list'] or @getDefaultSchemaList()
-      edit list
-      c.patch 'schema_list', list
+  editSchemaList: (edit) ->
+    @customize 'default', (c) =>
+      (
+        list = c.root.patch['schema_list']
+        if list?
+          Promise.resolve(list)
+        else
+          @getDefaultSchemaList()
+      )
+      .then (list) ->
+        edit list
+        c.patch 'schema_list', list
 
-  # callback: (err) ->
-  enableSchema: (schemaId, callback) ->
-    @editSchemaList callback, (schemaList) ->
+  enableSchema: (schemaId) ->
+    @editSchemaList (schemaList) ->
       unless schemaId in schemaList
         schemaList.push schemaId
 
-  # callback: (err) ->
-  disableSchema: (schemaId, callback) ->
-    @editSchemaList callback, (schemaList) ->
+  disableSchema: (schemaId) ->
+    @editSchemaList (schemaList) ->
       if ~(index = schemaList.indexOf schemaId)
         schemaList.splice index, 1
 
-  # callback: (err) ->
   # edit: (customizer) ->
-  customize: (configId, callback, edit) ->
+  customize: (configId, edit) ->
     configPath = "#{@rimeUserDir}/#{configId}.custom.yaml"
     c = new Customizer
-    finish = (c) ->
-      edit c
-      c.saveFile configPath, callback
-    fs.exists configPath, (exists) ->
-      if exists
-        c.loadFile configPath, (err) ->
-          if err
-            callback err
-          else
-            finish c
+    (
+      if fs.existsSync configPath
+        c.loadFile configPath
       else
-        finish c
+        Promise.resolve()
+    )
+    .then ->
+      edit c
+      c.saveFile configPath

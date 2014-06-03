@@ -4,13 +4,14 @@ path = require 'path'
 exports.UserScript = class UserScript
   constructor (@code) ->
 
-  loadFile: (filePath, callback) ->
-    fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
-      if err
-        callback err
-        return
-      @code = data
-      callback()
+  loadFile: (filePath) ->
+    new Promise (resolve, reject) =>
+      fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
+        if err
+          reject err
+        else
+          @code = data
+          resolve()
 
   compile: ->
     @script = vm.createScript @code
@@ -23,22 +24,22 @@ exports.UserCoffeeScript = class UserCoffeeScript extends UserScript
     coffee = require 'coffee-script'
     @script = vm.createScript(coffee.compile @code)
 
-exports.runUserScript = (filePath, ingredients, callback) ->
+exports.runUserScript = (filePath, ingredients) ->
   script = new (
     if path.extname(filePath) is '.coffee' then UserCoffeeScript else UserScript
   )
-  script.loadFile filePath, (err) ->
-    if err
-      callback err
-      return
+  script.loadFile(filePath)
+  .then ->
     try
       script.compile()
       sandbox = {}
       for key, value of exports
         sandbox[key] = value
       sandbox.ingredients = ingredients
+      sandbox.cook = (recipe, ingredients) ->
+        sandbox.result = Promise.resolve().then ->
+          cook recipe, ingredients
       script.run sandbox
+      sandbox.result
     catch e
-      callback e
-      return
-    callback()
+      return Promise.reject e

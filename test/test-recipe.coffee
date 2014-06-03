@@ -31,14 +31,14 @@ exports.testParametrizedRecipe = (test) ->
     params: [
       {name: 'required_param', required: true}
     ]
-  test.throws -> rime.cook recipe
+  test.throws -> recipe.collectParams {}
   recipe = new rime.Recipe
     name: 'a_name'
     version: '1.0'
     params: [
       {name: 'required_param', required: true}
     ]
-  test.doesNotThrow -> rime.cook recipe, {required_param: 'value'}
+  test.doesNotThrow -> recipe.collectParams {required_param: 'value'}
   test.done()
 
 exports.recipeCustomize =
@@ -59,16 +59,17 @@ exports.recipeCustomize =
     callback()
 
   testRecipeCustomize: (test) ->
-    done = (err) =>
-      test.ifError err
-      c = new rime.Config
-      c.loadFile @configPath, (err) ->
-        test.ifError err
-        test.equal c.get('patch')['foo/bar'], 'test'
-        test.done()
-    @recipe.customize @recipe.props.name, done, (c) ->
+    @recipe.customize @recipe.props.name, (c) ->
       test.ok c
       c.patch 'foo/bar', 'test'
+    .then =>
+      c = new rime.Config
+      c.loadFile(@configPath).then ->
+        test.equal c.get('patch')['foo/bar'], 'test'
+    .catch (err) ->
+      test.ifError err
+    .then ->
+      test.done()
 
 ###
 exports.testRecipeDownload = (test) ->
@@ -77,11 +78,16 @@ exports.testRecipeDownload = (test) ->
     version: '1.0'
     rimeUserDir: 'test'
     files: [
-      'https://raw.github.com/lotem/rimekit/master/sample/dungfungpuo.recipe.coffee'
-      'https://raw.github.com/lotem/rimekit/master/sample/horizontal_layout.recipe.coffee'
-      'https://raw.github.com/lotem/rimekit/master/sample/slash_symbols.recipe.coffee'
+      'https://raw.github.com/lotem/rimekit/develop/sample/dungfungpuo.recipe.coffee'
+      'https://raw.github.com/lotem/rimekit/develop/sample/horizontal_layout.recipe.coffee'
+      'https://raw.github.com/lotem/rimekit/develop/sample/slash_symbols.recipe.coffee'
     ]
-  recipe.downloadFiles (err) ->
+  recipe.downloadFiles()
+  .then ->
+    # TODO: check file integrity.
+    true
+  .catch (err) ->
     test.ifError err
+  .then ->
     test.done()
 ###

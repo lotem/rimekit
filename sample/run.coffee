@@ -18,8 +18,6 @@ for x in argv.slice(3)
   ingredients[k] = v
 console.log "ingredients: #{JSON.stringify ingredients}"
 
-rime.runUserScript recipeScript, ingredients, (err) ->
-  if err
-    console.error err
-  else
-    console.log 'done.'
+rime.runUserScript(recipeScript, ingredients)
+.then -> console.log 'done.'
+.catch console.error

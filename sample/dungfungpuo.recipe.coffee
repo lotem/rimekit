@@ -9,6 +9,7 @@ cook new Recipe
     'https://raw.github.com/lotem/rime-forge/master/dungfungpuo/dungfungpuo.schema.yaml'
     'https://raw.github.com/lotem/rime-forge/master/dungfungpuo/dungfungpuo.dict.yaml'
   ]
-  setup: (done) ->
-    @installSchema 'dungfungpuo', =>
-      @enableSchema 'dungfungpuo', done
+  setup: ->
+    @installSchema('dungfungpuo')
+    .then =>
+      @enableSchema('dungfungpuo')

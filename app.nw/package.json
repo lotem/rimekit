@@ -25,6 +25,7 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
+    "bluebird": "*",
     "coffee-script": "*",
     "diff": "*",
     "escape-html": "*",

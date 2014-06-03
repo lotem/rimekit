@@ -11,24 +11,30 @@ exports.Config = class Config
     @root = jsyaml.safeLoad yaml, filename: filePath
     return @
 
-  loadFile: (filePath, callback) ->
-    fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
-      if err
-        console.error "error loading config: #{err}"
-        callback err
-      else
+  loadFile: (filePath) ->
+    new Promise (resolve, reject) =>
+      fs.readFile filePath, {encoding: 'utf8'}, (err, data) =>
+        if err
+          console.error "error loading config: #{err}"
+          reject err
+          return
         # remove potential BOM character
         yaml = data.replace /^\ufeff/, ''
         try
           @root = jsyaml.safeLoad yaml, filename: filePath
         catch err
           console.error "error loading config: #{err}"
-          callback err
+          reject err
           return
-        callback()
+        resolve()
 
-  saveFile: (filePath, callback) ->
-    fs.writeFile filePath, @toString(), callback
+  saveFile: (filePath) ->
+    new Promise (resolve, reject) =>
+      fs.writeFile filePath, @toString(), (err) ->
+        if err
+          reject err
+        else
+          resolve()
 
   toString: ->
     jsyaml.safeDump @root, flowLevel: 3

@@ -1,14 +1,16 @@
 fs = require('fs')
 
 exports.Table = class Table
-  loadFile: (filePath, callback) ->
-    fs.readFile filePath, (err, data) =>
-      if err
-        console.error "error loading table: #{err}"
-        callback null
-      else
-        console.log "read table #{filePath}"
-        callback(@getSyllabary data)
+  loadFile: (filePath) ->
+    new Promise (resolve, reject) =>
+      fs.readFile filePath, (err, data) =>
+        if err
+          console.error "error loading table: #{err}"
+          reject err
+        else
+          console.log "read table #{filePath}"
+          @syllabary = @getSyllabary data
+          resolve()
 
   getSyllabary: (buf) ->
     result = []
