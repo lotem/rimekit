@@ -71,7 +71,7 @@ exports.recipeCustomize =
     .then ->
       test.done()
 
-###
+####
 exports.testRecipeDownload = (test) ->
   recipe = new rime.Recipe
     name: 'sample_recipes'
@@ -89,4 +89,4 @@ exports.testRecipeDownload = (test) ->
     test.ifError err
   .then ->
     test.done()
-###
+####

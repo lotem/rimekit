@@ -128,30 +128,36 @@ exports.Recipe = class Recipe
     fs.mkdirSync download unless fs.existsSync download
     @downloadDirectory = "#{download}/#{@props.name}"
     fs.mkdirSync @downloadDirectory unless fs.existsSync @downloadDirectory
-    # TODO: reuse downloaded files
     downloadFile = (fileUrl) =>
       fileName = url.parse(fileUrl).pathname.split('/').pop()
       dest = "#{@downloadDirectory}/#{fileName}"
-      new Promise (resolve, reject) =>
-        console.log "downloading #{fileName}"
-        request.get(fileUrl)
-        .on('error', (e) ->
-          console.log "failed to download #{fileName}: #{e.message}"
-          reject e
-        )
-        .on('end', =>
-          console.log "#{fileName} downloaded to #{@downloadDirectory}"
-          resolve()
-        )
-        .pipe fs.createWriteStream(dest)
-      .then =>
-        if @props.sha1sum?
+      (
+        if @props.sha1sum?[fileName] and fs.existsSync dest
           @checksum fileName, dest
+        else
+          Promise.reject()
+      )
+      .catch =>
+        new Promise (resolve, reject) =>
+          console.log "downloading #{fileName}"
+          request.get(fileUrl)
+          .on('error', (e) ->
+            console.log "failed to download #{fileName}: #{e.message}"
+            reject e
+          )
+          .on('end', =>
+            console.log "#{fileName} downloaded to #{@downloadDirectory}"
+            resolve()
+          )
+          .pipe fs.createWriteStream(dest)
+        .then =>
+          if @props.sha1sum?[fileName]
+            @checksum fileName, dest
     Promise.all(@props.files.map downloadFile)
 
   checksum: (fileName, filePath) ->
-    expected = @props.sha1sum[fileName]
-    return Promise.resolve() unless expected
+    expected = @props.sha1sum?[fileName]
+    return Promise.reject() unless expected
     new Promise (resolve, reject) =>
       shasum = crypto.createHash 'sha1'
       stream = fs.ReadStream filePath
