@@ -1,3 +1,4 @@
+crypto = require 'crypto'
 fs = require 'fs'
 path = require 'path'
 request = require 'request'
@@ -121,18 +122,18 @@ exports.Recipe = class Recipe
       @params[name] = ingredients[name]
 
   downloadFiles: ->
-    unless @props.files  # no files needed to download
+    unless @props.files  # no files to download
       return Promise.resolve()
     download = "#{@rimeUserDir}/download"
     fs.mkdirSync download unless fs.existsSync download
     @downloadDirectory = "#{download}/#{@props.name}"
     fs.mkdirSync @downloadDirectory unless fs.existsSync @downloadDirectory
-    total = @props.files.length
+    # TODO: reuse downloaded files
     downloadFile = (fileUrl) =>
+      fileName = url.parse(fileUrl).pathname.split('/').pop()
+      dest = "#{@downloadDirectory}/#{fileName}"
       new Promise (resolve, reject) =>
-        fileName = url.parse(fileUrl).pathname.split('/').pop()
         console.log "downloading #{fileName}"
-        dest = "#{@downloadDirectory}/#{fileName}"
         request.get(fileUrl)
         .on('error', (e) ->
           console.log "failed to download #{fileName}: #{e.message}"
@@ -143,7 +144,25 @@ exports.Recipe = class Recipe
           resolve()
         )
         .pipe fs.createWriteStream(dest)
+      .then =>
+        if @props.sha1sum?
+          @checksum fileName, dest
     Promise.all(@props.files.map downloadFile)
+
+  checksum: (fileName, filePath) ->
+    expected = @props.sha1sum[fileName]
+    return Promise.resolve() unless expected
+    new Promise (resolve, reject) =>
+      shasum = crypto.createHash 'sha1'
+      stream = fs.ReadStream filePath
+      stream.on 'data', (data) -> shasum.update(data)
+      stream.on 'error', (err) -> reject err
+      stream.on 'end', ->
+        if shasum.digest('hex') == expected
+          console.log "#{fileName}: #{expected}"
+          resolve()
+        else
+          reject new Error "checksum mismatch: #{fileName}"
 
   copyFile: (src) ->
     new Promise (resolve, reject) =>

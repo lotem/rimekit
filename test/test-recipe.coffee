@@ -78,14 +78,13 @@ exports.testRecipeDownload = (test) ->
     version: '1.0'
     rimeUserDir: 'test'
     files: [
-      'https://raw.github.com/lotem/rimekit/develop/sample/dungfungpuo.recipe.coffee'
       'https://raw.github.com/lotem/rimekit/develop/sample/horizontal_layout.recipe.coffee'
       'https://raw.github.com/lotem/rimekit/develop/sample/slash_symbols.recipe.coffee'
     ]
+    sha1sum:
+      "horizontal_layout.recipe.coffee": "956eea0d7d76b6f7fb006268d4c68fba4af23590"
+      "slash_symbols.recipe.coffee": "1b5a8d788a0ac54983f6eb1493dd6c7f6187ca22"
   recipe.downloadFiles()
-  .then ->
-    # TODO: check file integrity.
-    true
   .catch (err) ->
     test.ifError err
   .then ->

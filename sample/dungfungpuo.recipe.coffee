@@ -2,7 +2,7 @@
 
 cook new Recipe
   name: 'dungfungpuo'
-  version: '0.1'
+  version: '0.2'
   category: 'schema'
   description: '東風破古韻輸入法'
   files: [
@@ -13,3 +13,6 @@ cook new Recipe
     @installSchema('dungfungpuo')
     .then =>
       @enableSchema('dungfungpuo')
+  sha1sum:
+    "dungfungpuo.dict.yaml": "7615c6e1402ef122bddc7c65205954cb1e653450"
+    "dungfungpuo.schema.yaml": "b0f9c5f45ff05158c94c61a736fc26c142470e22"
