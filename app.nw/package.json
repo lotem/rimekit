@@ -29,7 +29,6 @@
     "coffee-script": "*",
     "diff": "*",
     "escape-html": "*",
-    "firebase": "*",
     "js-yaml": "*",
     "request": "*"
   },
