@@ -261,4 +261,5 @@ exports.Recipe = class Recipe
     )
     .then ->
       edit c
+    .then ->
       c.saveFile configPath
