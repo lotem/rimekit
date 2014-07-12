@@ -1,4 +1,5 @@
 fs = require('fs')
+marisa = require('node-marisa-trie')
 
 exports.Table = class Table
   loadFile: (filePath) ->
@@ -12,6 +13,7 @@ exports.Table = class Table
           @syllabary = @getSyllabary data
           resolve()
 
+  # TODO: support Rime::Table/2.0 with marisa trie.
   getSyllabary: (buf) ->
     result = []
     offset = 44  # metadata.syllabary
