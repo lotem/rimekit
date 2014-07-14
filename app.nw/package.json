@@ -30,7 +30,7 @@
     "diff": "*",
     "escape-html": "*",
     "js-yaml": "*",
-    "node-marisa-trie": ">= 0.1.1",
+    "node-marisa-trie": ">= 0.1.2",
     "request": "*"
   },
   "optionalDependencies": {
