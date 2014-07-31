@@ -1,7 +1,7 @@
 fs = require('fs')
 os = require('os')
 path = require('path')
-marisa = require('node-marisa-trie')
+marisa = null
 
 EPSILON = 1e-10
 
@@ -34,6 +34,7 @@ exports.Table = class Table
     stringTableSize = buf.readUInt32LE(offset)
     offset += 4
     trieData = buf.slice stringTableOffset, stringTableOffset + stringTableSize
+    marisa ?= require('node-marisa-trie')
     trie = marisa.createTrie()
     trie.map trieData
     trie
